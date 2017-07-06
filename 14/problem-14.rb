@@ -1,22 +1,18 @@
 # problem 14
 
 def collaz_sequence(n, count)
-  count += 1
   if n == 1
-    puts "count: " + count.to_s
-    return count
+    return count+1
   elsif n.odd?
-    collaz_sequence(n.to_i / 2, count)
+    return collaz_sequence(3*n.to_i+1, count+1)
   else
-    collaz_sequence(3*n.to_i + 1, count)
+    return collaz_sequence(n.to_i/2, count+1)
   end
 end
 
-def check(n, max_length)
-  length = collaz_sequence(n, 0)
-  max_length = (max_length < length ? length : max_length)
-end
-
-max_length = 0
-2.step(4, 1){ |n| max_length = check(n, max_length)}
-puts max_length
+length = [0, 1]
+2.step(1000000, 1) { |n|
+  length[n] = collaz_sequence(n, 0)
+}
+puts length.max
+puts length.index(length.max).to_s
