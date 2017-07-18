@@ -6,10 +6,10 @@ count = 0
 100.times do |n|
   year.each_with_index do |num_of_days, month|
     days = days + num_of_days
-    if n.div(4) == 0 && month == 1
+    if (n+1).div(4) == 0 && month == 1
       days = days + 1
     end
-    if days % 7 == 0
+    if days % 7 == 6
       count = count + 1
     end
 
