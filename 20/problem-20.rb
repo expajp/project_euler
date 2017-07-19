@@ -12,13 +12,20 @@ count_fives = 0
     tmp = tmp / 5
   end
   
-  if(tmp % 2 == 0 && count_fives > 0)
+  if(tmp % 4 == 0 && count_fives > 1)
+    count_fives = count_fives - 2
+    tmp = tmp / 4
+  elsif(tmp % 2 == 0 && count_fives > 0)
     count_fives = count_fives - 1
     tmp = tmp / 2
   end
 
+  # puts (n+1).to_s + " " + tmp.to_s + " " + count_fives.to_s
+
   num = num * tmp
 end
+
+# puts num
 
 answer = 0
 num.to_s.each_char{ |c| answer = answer + c.to_i }
