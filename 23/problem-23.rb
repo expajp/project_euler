@@ -18,13 +18,27 @@ def func_d(n)
   return list_divisor(n).inject(:+)
 end
 
-inabundant = []
-
-#28123
-100.times do |n|
+# 過剰数を配列に格納
+abundant = []
+28123.times do |n|
   if func_d(n+1) > n+1
-    inabundant.push(n+1)
+    abundant.push(n+1)
+  end
+end
+abundant = abundant.sort
+# puts abundant.to_s
+
+answer = 0
+28123.times do |n|
+  # puts (n+1).to_s
+  abundant.each do |a| # 過剰数の小さい順にループ
+    if n+1 <= a # aよりn+1が小さくなれば、「2つの過剰数の和で表せる数」でない
+      answer = answer + (n+1)
+      break
+    elsif abundant.include?(n+1-a) # (n+1)-aが過剰数ならば、n+1は過剰数の和
+      break
+    end
   end
 end
 
-puts inabundant.to_s
+puts answer.to_s
