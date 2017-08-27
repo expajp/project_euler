@@ -14,24 +14,28 @@ answer = 0
 
 i = 1
 loop do
-  prod = i
+  prod = i.to_s
 
-  j = 2
+  j = 1
   loop do
-    prod = prod * i * j
+    j = j + 1
+    prod = prod.to_s + (i * j).to_s
+    # puts "#{i} #{j} #{prod}"
     
-    prod_len = prod.to_s.length
+    prod_len = prod.length
+    
     break if prod_len > 9
     next if prod_len < 9
+
     if prod_len == 9 && pandigital(prod)
-      answer = prod
-      puts prod.to_s
-      break
+      answer = (prod.to_i > answer.to_i ? prod.to_i : answer.to_i)
+      puts "#{i} #{j} #{prod}"
     end
   end
   
   i = i + 1
-  break if i * i * 2 > 1000000000
+  # break if i > 9
+  break if i.to_s.length + (i*2).to_s.length > 9
 end
 
 puts answer.to_s
