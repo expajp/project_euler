@@ -14,8 +14,7 @@ def check_if_prime(n)
 end
 
 def trancatable_ltor(str)
-  (str.length-1).times do |i|
-    puts str.slice(i, str.length-i) + " " + i.to_s + " " + (str.length-i).to_s
+  (str.length).times do |i|
     return false if !check_if_prime(str.slice(i, str.length-i).to_i)
   end
   return true
@@ -23,7 +22,6 @@ end
 
 def trancatable_rtol(str)
   (str.length).times do |i|
-    puts str.slice(0, str.length-i)
     return false if !check_if_prime(str.slice(0, str.length-i).to_i)
   end
   return true
@@ -35,14 +33,13 @@ answer = []
 i = 10
 loop do
   i = i + 1
-  puts "check now: " + i.to_s
 
   str = i.to_s
   next if !trancatable_ltor(str)
   next if !trancatable_rtol(str)
   
   answer.push(i)
-  break if answer.length >= 3
+  break if answer.length >= 11
 end
 
 puts answer.to_s
