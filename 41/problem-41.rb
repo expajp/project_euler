@@ -25,7 +25,8 @@ end
 
 answer = 0
 
-8.step(9) do |n|
+2.step(9) do |n|
+  next if ('1'..n.to_s).inject(:+).to_i % 3 == 0
   (10**(n-1)+1).step(10**(n-1)*(n+1), 2) do |i|
     next if i.to_s.include?('0')
     next if !pandigital(i, n)
