@@ -11,38 +11,39 @@ def pandigital?(n)
   return false
 end
 
-def permutation(str_arr, arr)
-  return [] if arr.length < 1
-
-  if arr.length == 1
-    ret = []
-    if str_arr.length == 0
-      ret.push(arr[0])
+def permutation(arr)
+  return [] if arr.length == 0
+  
+  ret = []
+  arr.each do |c|
+    arr_copy = arr.dup
+    arr_copy.delete(c)
+    if arr_copy.length == 0
+      ret.push(c)
     else
-      str_arr.each {|str| ret.push(str+arr[0])}
-    end
-    return ret
-    
-  else
-    arr.each do |c|
-      ret = []
-      if str_arr.length == 0
-        ret.push(arr[0])
-      else
-        str_arr.each{ |str| ret.push(str+c.to_s)}
-      end
-      return permutation(ret, arr.delete(c))
+      permutation(arr_copy).each{ |str| ret.push(c.to_s+str)}
     end
   end
+  return ret
 end
 
-puts permutation([], ('0'..'3').to_a).to_s
-#puts permutation(["1","2"], ['0']).to_s
+puts "finished check all permutation of @numbers."
 
-=begin
-1.step(9) do |i|
-  
-  
+answer = 0
+permutation(@numbers).each do |str|
+  next if str.slice(0, 1) == "0"
+
+  next if str.slice(1, 3).to_i % 2 != 0
+  next if str.slice(2, 3).to_i % 3 != 0
+  next if str.slice(3, 3).to_i % 5 != 0
+  next if str.slice(4, 3).to_i % 7 != 0
+  next if str.slice(5, 3).to_i % 11 != 0
+  next if str.slice(6, 3).to_i % 13 != 0
+  next if str.slice(7, 3).to_i % 17 != 0
+  puts str
+  answer = answer + str.to_i
 end
-=end
+
+puts answer.to_s
+
 
