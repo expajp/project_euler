@@ -32,7 +32,7 @@ def pentagonal?(m)
 end
 
 catch(:first_search) do
-  p = add_pentagonal(1,100,[])
+  p = add_pentagonal(1001,1000,[])
 
   p.length.times do |i|
     (i+1).step(p.length-1) do |j|
