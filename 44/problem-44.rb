@@ -2,10 +2,9 @@
 # Problem 44
 
 =begin
-最小値を考える場合、すべての組合せを調べなくてはならない
-2つの五角数の差は広がっていく一方なので、ある「条件を満たすペア」が見つかれば、
-それ自身かそれ以下の差を持つ五角数ペアが正解のはず
-つまり、最初は「とりあえず一つ見つける」という泥臭い探索をしなくてはならない
+p_j-p_i=p_kならば、p_i+p_k=p_jである。
+このとき、p_i+p_jが五角数であればよい。
+つまり、引き算はする必要がない。
 =end
 
 def add_pentagonal(start, length, arr)
@@ -32,14 +31,16 @@ def pentagonal?(m)
 end
 
 catch(:first_search) do
-  p = add_pentagonal(1001,1000,[])
+  p = add_pentagonal(2001,1000,[])
 
-  p.length.times do |i|
-    (i+1).step(p.length-1) do |j|
-      # puts "#{i}, #{p[i]} #{j}, #{p[j]} #{pentagonal?(p[i]+p[j])} #{pentagonal?(p[j]-p[i])}"
-      if pentagonal?(p[i]+p[j]) && pentagonal?(p[j]-p[i])
-        puts "#{p[i]} #{p[j]}"
-        throw(:first_search)
+  p.length.times do |k|
+    (k+1).step(p.length-1) do |i|
+      if pentagonal?(p[k]+p[i])
+        puts "p_k = #{p[k]}, p_i = #{p[i]}"
+        if pentagonal?(p[k]+p[i]+p[i])
+          puts "p_j = #{p[k]+p[i]}"
+          throw(:first_search)
+        end
       end
     end
   end
