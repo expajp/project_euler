@@ -30,8 +30,9 @@ def pentagonal?(m)
   
 end
 
+# =begin
 catch(:first_search) do
-  p = add_pentagonal(2001,1000,[])
+  p = add_pentagonal(1900,10000,[])
 
   p.length.times do |k|
     (k+1).step(p.length-1) do |i|
@@ -46,3 +47,7 @@ catch(:first_search) do
   end
 
 end
+# =end
+
+# p = add_pentagonal(1, 2000, [])
+# puts p.include?(5482660).to_s
