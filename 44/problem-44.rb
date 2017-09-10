@@ -11,7 +11,7 @@ def add_pentagonal(start, length, arr)
   start.step(start+length) do |n|
     arr.push(n*(3*n-1)/2)
   end
-  return arr  
+  return arr.sort
 end
 
 def pentagonal?(m)
@@ -30,24 +30,19 @@ def pentagonal?(m)
   
 end
 
-# =begin
-catch(:first_search) do
-  p = add_pentagonal(1900,10000,[])
+p = add_pentagonal(1901, 10000, [])
 
-  p.length.times do |k|
-    (k+1).step(p.length-1) do |i|
-      if pentagonal?(p[k]+p[i])
-        puts "p_k = #{p[k]}, p_i = #{p[i]}"
-        if pentagonal?(p[k]+p[i]+p[i])
-          puts "p_j = #{p[k]+p[i]}"
-          throw(:first_search)
-        end
-      end
+catch(:found) do
+  1.step(p.length) do |d|
+    (d+1).step(p.length) do |j|
+      p_d = p[d-1]
+      p_j = p[j-1]
+      p_k = p_d.to_i + p_j.to_i
+      next if !pentagonal?(p_k.to_i)
+      puts "(d, j) = (#{1900+d}, #{1900+j}) p_j = #{p_j}, p_k = #{p_k}, D = #{p_d}"
+      next if !pentagonal?(p_j.to_i+p_k.to_i)
+      puts "S = #{p_j+p_k}"
+      throw(:found)
     end
   end
-
 end
-# =end
-
-# p = add_pentagonal(1, 2000, [])
-# puts p.include?(5482660).to_s
