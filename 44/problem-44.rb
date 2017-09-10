@@ -30,16 +30,16 @@ def pentagonal?(m)
   
 end
 
-p = add_pentagonal(1901, 10000, [])
+p = add_pentagonal(1, 2000, [])
 
 catch(:found) do
   1.step(p.length) do |d|
-    (d+1).step(p.length) do |j|
+    (d-1).step(1, -1) do |j|
       p_d = p[d-1]
       p_j = p[j-1]
       p_k = p_d.to_i + p_j.to_i
       next if !pentagonal?(p_k.to_i)
-      puts "(d, j) = (#{1900+d}, #{1900+j}) p_j = #{p_j}, p_k = #{p_k}, D = #{p_d}"
+      puts "(d, j) = (#{d}, #{j}) p_j = #{p_j}, p_k = #{p_k}, D = #{p_d}"
       next if !pentagonal?(p_j.to_i+p_k.to_i)
       puts "S = #{p_j+p_k}"
       throw(:found)
