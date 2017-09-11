@@ -32,7 +32,7 @@ end
 
 start = 144
 answer = 0
-h = get_hexagonal(start, 20000)
+h = get_hexagonal(start, 30000)
 
 h.each do |h_x|
   next if !pentagonal?(h_x)
