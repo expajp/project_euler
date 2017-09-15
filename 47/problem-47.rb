@@ -19,29 +19,14 @@ def get_num_prime_factors(n)
 
   ret = []
   buf = n
-  loop do
-    if buf % 2 == 0
-      buf = buf.div(2)
-      ret.push(2)
-    else
-      break
-    end
-  end
-
+  ret.push(2) if buf % 2 == 0
    
   3.step(limit, 2) do |p|
     next if !prime?(p)
-    loop do
-      if buf % p == 0
-        buf = buf.div(p)
-        ret.push(p)
-      else
-        break
-      end      
-    end
+    ret.push(p) if buf % p == 0
   end
 
-  return ret.uniq
+  return ret
   
 end
 
@@ -49,7 +34,14 @@ chain = 1
 p_length = 0
 i = 2
 loop do
-  length = get_num_prime_factors(i).size
+  if prime?(i)
+    p_length = 1
+    i = i + 1
+    next
+  end
+  
+  arr =  get_num_prime_factors(i)
+  length = arr.size
   if length == p_length
     chain = chain + 1
     break if chain == 4 && length == 4
@@ -57,9 +49,9 @@ loop do
     chain = 1
   end
   
-  puts "#{i} #{get_num_prime_factors(i)}" if chain >= 2 && length == 4
+  puts "#{i} #{arr}" if chain >= 2 && length == 4
   p_length = length
   i = i + 1
 end
 
-i.step(i-3, -1){|j| puts get_num_prime_factors(j).to_s}
+i.step(i-2, -1){|j| puts " #{j} #{get_num_prime_factors(j)}"}
