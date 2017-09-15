@@ -1,4 +1,4 @@
-B# Problem 47
+# Problem 47
 
 def prime?(n)
   return false if n <= 1
