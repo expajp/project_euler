@@ -1,4 +1,4 @@
-# Problem 47
+B# Problem 47
 
 def prime?(n)
   return false if n <= 1
@@ -54,4 +54,4 @@ loop do
   i = i + 1
 end
 
-i.step(i-2, -1){|j| puts " #{j} #{get_num_prime_factors(j)}"}
+i.step(i-3, -1){|j| puts " #{j} #{get_num_prime_factors(j)}"}
