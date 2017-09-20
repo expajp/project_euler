@@ -46,6 +46,7 @@ def prime_chain(n)
   return hash_arr if n < 5
 
   p = [2, 3]
+  max = 0
   i = 5
   loop do
     if prime?(i)
@@ -55,12 +56,14 @@ def prime_chain(n)
       hash_arr.each do |h|
         next if h["max"] != p_max
         hash_arr.push(hash_fac(h["sum"]+i, h["chain"]+1, i))
+        max = (h["sum"]+i > max ? h["sum"]+i : max)
       end
     end
     i = i + 2
     break if i > n
   end
+  hash_arr = (hash_arr.select{ |h| prime?(h["sum"])}).select{ |h| h["sum"] < n }
   return hash_arr
 end
 
-puts prime_chain(7).to_s
+puts prime_chain(1000).to_s
