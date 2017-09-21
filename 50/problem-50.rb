@@ -58,6 +58,7 @@ def prime_chain(n)
         hash_arr.push(hash_fac(h["sum"]+i, h["chain"]+1, i))
         max = (h["sum"]+i > max ? h["sum"]+i : max)
       end
+      hash_arr.push(hash_fac(i, 1, i))
     end
     i = i + 2
     break if i > n
@@ -66,4 +67,11 @@ def prime_chain(n)
   return hash_arr
 end
 
-puts prime_chain(1000).to_s
+chain = prime_chain(1000000)
+max_chain = hash_fac(0,0,0)
+
+chain.each do |h|
+  max_chain = h if h["chain"] > max_chain["chain"]
+end
+
+puts max_chain.to_s
