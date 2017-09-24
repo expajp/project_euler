@@ -47,20 +47,19 @@ def prime_chain(n)
 
   p = [2, 3]
   i = 5
+  max_chain = 0
   loop do
     if prime?(i)
       p_max = p.max
       p.push(i)
       puts "p_max: #{p_max}, i: #{i}"
-      hash_arr.each do |h|
+      hash_arr.each_with_index do |h, j|
         hash_arr.push(hash_fac(h["sum"]+i, h["chain"]+1, i)) if h["max"] == p_max
+        max_chain = (h["chain"] + 1 > max_chain && h["max"] == p_max ? h["chain"]+1 : max_chain)
+        hash_arr.delete_at(j) if h["max"] < p_max && h["chain"] < max_chain
       end
       hash_arr.push(hash_fac(i, 1, i))
-
-      hash_arr.each do |h|
-        hash_arr.delete(h) if h["max"] != i
-      end
-      # puts hash_arr.to_s
+      puts hash_arr.to_s
     end
     i = i + 2
     break if i > n
@@ -69,7 +68,7 @@ def prime_chain(n)
   return hash_arr
 end
 
-chain = prime_chain(10000)
+chain = prime_chain(100)
 # puts chain.to_s
 
 max_chain = hash_fac(0,0,0)
