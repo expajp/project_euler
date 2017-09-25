@@ -53,12 +53,13 @@ def prime_chain(n)
       p_max = p.max
       p.push(i)
       puts "p_max: #{p_max}, i: #{i}"
-      hash_arr.each_with_index do |h, j|
-        hash_arr.push(hash_fac(h["sum"]+i, h["chain"]+1, i)) if h["max"] == p_max
-        max_chain = (h["chain"] + 1 > max_chain && h["max"] == p_max ? h["chain"]+1 : max_chain)
-        hash_arr.delete_at(j) if h["max"] < p_max && h["chain"] < max_chain
+      dup = hash_arr.dup
+      dup.each do |h|
+        hash_arr.push(hash_fac(h["sum"]+i, h["chain"]+1, i)) if h["max"] == p_max && h["sum"]+i < n
+        max_chain = (h["chain"]+1 > max_chain ? h["chain"]+1 : max_chain)
       end
       hash_arr.push(hash_fac(i, 1, i))
+      hash_arr = hash_arr.select{|h| h["max"] > p_max}
       puts hash_arr.to_s
     end
     i = i + 2
