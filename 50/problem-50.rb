@@ -30,51 +30,50 @@ def prime?(n)
   return true
 end
 
-def hash_fac(sum, chain, max)
+def hash_fac(sum, chain, min)
   ret = Hash.new
   ret["sum"] = sum
   ret["chain"] = chain
-  ret["max"] = max
+  ret["min"] = min
   return ret
 end
 
 def prime_chain(n)
   hash_arr = Array.new
   hash_arr.push(hash_fac(2,1,2))
-  hash_arr.push(hash_fac(3,1,3))
-  hash_arr.push(hash_fac(5,2,3))
-  return hash_arr if n < 5
+  # hash_arr.push(hash_fac(3,1,3))
 
-  p = [2, 3]
-  i = 5
+  prime_chain_arr = Array.new
+  return prime_chain_arr if n < 5
+  
+  i = 3
   max_chain = 0
   loop do
     if prime?(i)
-      p_max = p.max
-      p.push(i)
-      puts "p_max: #{p_max}, i: #{i}"
+      # puts hash_arr.to_s
       dup = hash_arr.dup
-      dup.each do |h|
-        hash_arr.push(hash_fac(h["sum"]+i, h["chain"]+1, i)) if h["max"] == p_max && h["sum"]+i < n
-        max_chain = (h["chain"]+1 > max_chain ? h["chain"]+1 : max_chain)
-      end
+      dup.each_with_index do |h, j|
+        next_hash = hash_fac(h["sum"]+i, h["chain"]+1, h["min"])
+        if prime?(next_hash["sum"])
+          puts next_hash.to_s
+          prime_chain_arr.push(next_hash)
+        end
+        hash_arr.push(next_hash)
+        hash_arr.delete_at(j)
+      end      
       hash_arr.push(hash_fac(i, 1, i))
-      hash_arr = hash_arr.select{|h| h["max"] > p_max}
-      puts hash_arr.to_s
     end
     i = i + 2
     break if i > n
   end
-  hash_arr = (hash_arr.select{ |h| prime?(h["sum"])}).select{ |h| h["sum"] < n }
-  return hash_arr
+  prime_chain_arr = prime_chain_arr.select{ |h| h["sum"] < n}
+  return prime_chain_arr
 end
 
 chain = prime_chain(100)
 # puts chain.to_s
-
-max_chain = hash_fac(0,0,0)
+longest = hash_fac(0,0,0)
 chain.each do |h|
-  max_chain = h if h["chain"] > max_chain["chain"]
+  longest = h if h["chain"] > longest["chain"]
 end
-
-puts max_chain.to_s
+puts longest.to_s
