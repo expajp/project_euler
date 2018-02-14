@@ -9,22 +9,9 @@
 よって, この族の最初の数である56003は, このような性質を持つ最小の素数である.
 
 桁を同じ数で置き換えることで8つの素数が得られる最小の素数を求めよ. (注:連続した桁でなくても良い)
-=end
 
-def prime?(n)
-  return false if n <= 1
-  return true if n == 2
-  return false if n != 2 && n % 2 == 0
- 
-  limit = Math.sqrt(n).ceil
-  3.step(limit, 2) do |i|
-    return false if n % i == 0
-  end
+---
 
-  return true
-end
-
-=begin
 先頭の桁を含むかどうかで場合分けの必要がある
 先頭の桁を含む場合、0が使えない
 また、8個ということは末尾の桁は含まない
@@ -48,7 +35,24 @@ n=2について考える
 *9 ... 19, 29, 59, 79, 89
 
 これをリストアップすることを最初の目標にする
+
 =end
+
+require 'rmarshal'
+
+def prime?(n)
+  return false if n <= 1
+  return true if n == 2
+  return false if n != 2 && n % 2 == 0
+ 
+  limit = Math.sqrt(n).ceil
+  3.step(limit, 2) do |i|
+    return false if n % i == 0
+  end
+
+  return true
+end
+
 n = 2
 m = 1
 
@@ -62,12 +66,31 @@ end
 def starred_arrays(arr, digits)
   ret = []
   (digits+1).times do |i|
-    dupped_arr = arr.dup
-    ret.push(dupped_arr.each{ |str| str.insert(i, '*') })
+    copied_arr = Marshal.load(Marshal.dump(arr))
+    ret.push(copied_arr.map{ |str| str.insert(i, '*') })
   end
-  ret
+  ret.flatten
 end
 
 starred_arr = starred_arrays(n_digits_str(n-m), n-m)
+max_primes = 0
+answer = 0
+starred_arr.each do |num|
+  primes = 0
+  10.times do |i|
+    next if num.slice(0, 1) == '*' && i == 0
+    if prime?(num.gsub(/\*/, i.to_s).to_i)
+      primes += 1
+      p num.gsub(/\*/, i.to_s)
+    end
+    # break if (i-primes) > 1
+  end
 
-p starred_arr
+  if max_primes < primes
+    max_primes = primes
+    answer = num
+    p num
+  end
+end
+
+p "answer = #{answer}, max_primes = #{max_primes}"
