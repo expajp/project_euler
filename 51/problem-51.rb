@@ -52,8 +52,22 @@ n=2について考える
 n = 2
 m = 1
 
-def i_digits(i)
-  [*(10**(i-1))..(10**i)-1]
+# n桁の整数の「文字列」の配列を返す
+def n_digits_str(n)
+  return nil if n < 1
+  return [*0..9].map(&:to_s) if n == 1
+  [*(10**(n-1))..(10**n)-1].map(&:to_s)
 end
 
-p i_digits(3)
+def starred_arrays(arr, digits)
+  ret = []
+  (digits+1).times do |i|
+    dupped_arr = arr.dup
+    ret.push(dupped_arr.each{ |str| str.insert(i, '*') })
+  end
+  ret
+end
+
+starred_arr = starred_arrays(n_digits_str(n-m), n-m)
+
+p starred_arr
