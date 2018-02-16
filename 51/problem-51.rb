@@ -53,7 +53,7 @@ def prime?(n)
   return true
 end
 
-n = 2
+n = 3
 m = 1
 
 # n桁の整数の「文字列」の配列を返す
@@ -63,18 +63,25 @@ def n_digits_str(n)
   [*(10**(n-1))..(10**n)-1].map(&:to_s)
 end
 
-def starred_arrays(arr, digits)
+# digits桁の数字を文字列化した配列arrに対して、
+# stars個の*を挿入した配列を返す
+def starred_arrays(arr, digits, stars)
   ret = []
-  (digits+1).times do |i|
+  [*0..(digits+stars-1)].combination(stars) do |com|
     copied_arr = Marshal.load(Marshal.dump(arr))
-    ret.push(copied_arr.map{ |str| str.insert(i, '*') })
+    copied_arr.map do |str|
+      com.each{ |i| str.insert(i, '*') }
+    end
+    ret.push(copied_arr)
   end
   ret.flatten
 end
 
-starred_arr = starred_arrays(n_digits_str(n-m), n-m)
+starred_arr = starred_arrays(n_digits_str(n-m), n-m, 2)
+p starred_arr
 max_primes = 0
 answer = 0
+=begin
 starred_arr.each do |num|
   primes = 0
   10.times do |i|
@@ -94,3 +101,4 @@ starred_arr.each do |num|
 end
 
 p "answer = #{answer}, max_primes = #{max_primes}"
+=end
