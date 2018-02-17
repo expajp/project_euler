@@ -109,4 +109,3 @@ loop do
   break if max_primes == 8
   n += 1
 end
-
