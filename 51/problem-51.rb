@@ -53,9 +53,6 @@ def prime?(n)
   return true
 end
 
-n = 3
-m = 1
-
 # n桁の整数の「文字列」の配列を返す
 def n_digits_str(n)
   return nil if n < 1
@@ -77,28 +74,39 @@ def starred_arrays(arr, digits, stars)
   ret.flatten
 end
 
-starred_arr = starred_arrays(n_digits_str(n-m), n-m, 2)
-p starred_arr
+n = 2
 max_primes = 0
 answer = 0
-=begin
-starred_arr.each do |num|
-  primes = 0
-  10.times do |i|
-    next if num.slice(0, 1) == '*' && i == 0
-    if prime?(num.gsub(/\*/, i.to_s).to_i)
-      primes += 1
-      p num.gsub(/\*/, i.to_s)
-    end
-    # break if (i-primes) > 1
-  end
+flag = false
 
-  if max_primes < primes
-    max_primes = primes
-    answer = num
-    p num
+loop do
+  
+  1.upto (n-1) do |m|
+    p "n = #{n}, m = #{m}"
+    
+    starred_arr = starred_arrays(n_digits_str(n-m), n-m, m)
+    starred_arr.each do |num|
+      primes = 0
+      10.times do |i|
+        next if num.slice(0, 1) == '*' && i == 0
+        if prime?(num.gsub(/\*/, i.to_s).to_i)
+          primes += 1
+          # p num.gsub(/\*/, i.to_s)
+        end
+        break if (i-primes) > 1
+      end
+
+      if max_primes < primes
+        max_primes = primes
+        answer = num
+        p num
+      end
+    end
+
+    p "answer = #{answer}, max_primes = #{max_primes}"
   end
+  
+  break if max_primes == 8
+  n += 1
 end
 
-p "answer = #{answer}, max_primes = #{max_primes}"
-=end
