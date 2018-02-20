@@ -12,16 +12,14 @@ def change_num(num)
 end
 
 # 数字だけでできた配列が同じ数字を2つ以上含む場合、
-# 最初にでてきたものがいくつあるか数えて返す
+# 最初にでてきたものがいくつあるか数え、残りの配列とセットで返す
 def get_how_many_same_nums(arr)
   arr.sort!
   ret = 0
   arr.each_cons(2).with_index do |a, i|
-    p "#{a}, #{i}"
     if a[0] == a[1]
       ret += (ret > 0 ? 1 : 2)
     elsif ret > 0
-      p arr-arr[0..i]
       return { count: ret, left: arr-arr[0..i] }
     end
   end
