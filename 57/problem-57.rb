@@ -18,30 +18,30 @@
 =end
 
 class Fraction
-  attr_accessor :element, :denominator
+  attr_accessor :elm, :den
 
   def initialize(elm, den)
-    @element = elm
-    @denominator = den
-  end
-
-  # 通分
-  def reduce_to_common_den
+    @elm = elm
+    @den = den
   end
 
   # 分数表示
   def to_s
-    "#{@element}/#{@denominator}"
+    "#{@elm}/#{@den}"
   end
 
   # 加算
-  def add
+  def add(frac)
+    @elm = @elm*frac.den + frac.elm*@den
+    @den = @den * frac.den
+    self
   end
 
   private
 
   # 約分
   def reduce
+    # self
   end
 
   # 分母と分子の最大公約数を求める
@@ -51,9 +51,13 @@ class Fraction
 
   # 約数を求める
   def get_divisors(n)
+    
   end  
 end
 
 # 工数を指定して再帰的に求める
-frac = Fraction.new(1,2)
+frac = Fraction.new(1,6)
+frac_2 = Fraction.new(1,3)
 p frac.to_s
+p frac_2.to_s
+p frac.add(frac_2).to_s
