@@ -13,6 +13,7 @@
 この問題での課題は簡単になっている. 暗号化鍵は3文字の小文字である. cipher1.txtは暗号化されたASCIIのコードを含んでいる. また, 平文はよく用いられる英単語を含んでいる. この暗号文を復号し, 平文のASCIIでの値の和を求めよ.
 =end
 
+answer = 0
 File.open("p059_cipher.txt") do |f|
   code = f.read.gsub(/\n/, "").split(',').map(&:to_i)
 
@@ -20,13 +21,18 @@ File.open("p059_cipher.txt") do |f|
     97.upto(122) do |j|
       97.upto(122) do |k|
         pass = [i, j, k]
-        answer = code.map.with_index{ |a, n| (a^pass[n%3]) }
-        next if answer.select{ |c| c < 32 || 122 < c }.any?
-        p answer.map(&:chr).inject(&:+)
+        answer_arr = code.map.with_index{ |a, n| (a^pass[n%3]) }
+        next if answer_arr.select{ |c| c < 32 || 122 < c }.any?
+        text = answer_arr.map(&:chr).inject(&:+)
+        if text.include?("The Gospel of John")
+          p text
+          answer = answer_arr.inject(&:+)
+          p answer
+          exit
+        end
       end
     end
-  end
- 
+  end 
 end
 
 
