@@ -7,6 +7,20 @@
 任意の2つの素数を繋げたときに別の素数が生成される, 5つの素数の集合の和の中で最小のものを求めよ.
 =end
 
+def get_primes_under(n)
+  arr = [*2..n]
+  limit = Math.sqrt(n).floor
+  p = 2
+  used_p = []
+
+  while(p < limit)
+    arr = arr.reject{ |i| i != p && i % p == 0 }
+    used_p.push(p)
+    p = (arr - used_p).first
+  end
+  return arr
+end
+
 def prime?(n)
   return false if n <= 1 || (n != 2 && n % 2 == 0)
   return true if n == 2
@@ -25,4 +39,18 @@ def prime_pair?(p1, p2)
   true
 end
 
-p prime_pair?(7, 109)
+n = 100
+count = 0
+loop do
+  primes = get_primes_under(n)
+  combi = primes.combination(5).to_a
+  p combi.length
+  combi.each do |a|
+    p a
+    next if !(a.combination(2).map{ |arr| prime_pair?(arr[0], arr[1]) }.inject(:&))
+    p a.inject(:+)
+    count += 1
+  end
+  break if count > 0
+  n += 100
+end
