@@ -39,18 +39,37 @@ def prime_pair?(p1, p2)
   true
 end
 
-n = 100
+n = 10000
 count = 0
-loop do
-  primes = get_primes_under(n)
-  combi = primes.combination(5).to_a
-  p combi.length
-  combi.each do |a|
-    p a
-    next if !(a.combination(2).map{ |arr| prime_pair?(arr[0], arr[1]) }.inject(:&))
-    p a.inject(:+)
-    count += 1
+
+primes = get_primes_under(n)
+prime_pair_set = primes.combination(2).to_a.select { |a| prime_pair?(a[0], a[1]) }
+p prime_pair_set.length
+
+2.upto(4) do |size|
+  next_set = []
+  prime_pair_set.each do |combi|
+    primes.each do |p|
+      next if combi.include?(p)
+      
+      next_flg = false
+      combi.each do |q|
+        if !prime_pair?(p, q)
+          next_flg = true
+          break
+        end
+      end
+      next if next_flg
+      next if next_set.include?((combi+[p]).sort)
+      next_set.push(combi.dup.push(p).sort)
+      # p "combi = #{combi}, p = #{p}"
+    end
   end
-  break if count > 0
-  n += 100
+  p size
+  # p next_set
+
+  next_set_sum = []
+  next_set.each{ |arr| next_set_sum.push(arr.inject(:+)) } # if size == 4
+  p next_set_sum.min
+  prime_pair_set = next_set
 end
