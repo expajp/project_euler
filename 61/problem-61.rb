@@ -47,6 +47,10 @@ def set_polygonal
       else
         return
       end
+      if j < 1000
+        i += 1
+        next
+      end
       break if j > 9999
       @polygonal[n].push(j)
       i += 1
@@ -59,10 +63,16 @@ def polygonal?(n, i)
 end
 
 set_polygonal()
+# @polygonal.each{ |a| p a&.length }
 
+=begin
+順序付きの配列だが、最初の要素はなんでもよい
+よって、最初の要素を三角数に固定し、三角数を順に調べる
+深さ優先探索で、先頭2文字が一致するやつを順に調べて行って駄目なら手戻り
+調べたpolygonalを保持する配列を作り、手戻りしたら再度配列に値を追加
+=end
 
+edge = [*4..8]
+@polygonal[3].each |tri| do
 
-p cyclical?([8128, 2882, 8281])
-p polygonal?(3, 8128)
-p polygonal?(5, 2882)
-p polygonal?(4, 8281)
+end
