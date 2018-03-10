@@ -62,6 +62,26 @@ def polygonal?(n, i)
   @polygonal[n].include?(i)
 end
 
+def search_cyclical(edge, chain)
+  @polygonal[edge.shift].each do |n|
+    if !@polygonal[edge[0]].select{ |m| n.to_s.slice(-2,2) == m.to_s.slice(0,2) }.nil?
+      p "#{edge.first-1} #{n}"
+      if edge.length == 1
+        chain.push(n)
+        chain.push(@polygonal[edge[0]].select{ |m| n.to_s.slice(-2,2) == m.to_s.slice(0,2) }.first)
+        p chain
+        return
+      else
+        chain.push(n)
+        search_cyclical(edge, chain)
+      end
+    else
+      chain = []
+      next
+    end
+  end
+end
+
 set_polygonal()
 # @polygonal.each{ |a| p a&.length }
 
@@ -72,7 +92,7 @@ set_polygonal()
 調べたpolygonalを保持する配列を作り、手戻りしたら再度配列に値を追加
 =end
 
-edge = [*4..8]
-@polygonal[3].each |tri| do
+edge = [*3..8]
+chain = []
+search_cyclical(edge, chain)
 
-end
