@@ -64,20 +64,19 @@ end
 
 def search_cyclical(edge, chain)
   @polygonal[edge.shift].each do |n|
-    if !@polygonal[edge[0]].select{ |m| n.to_s.slice(-2,2) == m.to_s.slice(0,2) }.nil?
-      p "#{edge.first-1} #{n}"
-      if edge.length == 1
-        chain.push(n)
-        chain.push(@polygonal[edge[0]].select{ |m| n.to_s.slice(-2,2) == m.to_s.slice(0,2) }.first)
-        p chain
-        return
-      else
-        chain.push(n)
-        search_cyclical(edge, chain)
-      end
+    if chain.empty?
+      p "#{edge.first-1} #{n}" if edge.any?
+      search_cyclical(edge.dup, [n])      
     else
-      chain = []
-      next
+      if chain.last.to_s.slice(-2,2) == n.to_s.slice(0,2)
+        p "#{' '*(edge.first-3)}#{edge.first-1} #{n}" if edge.any?
+        if edge.empty? && n.to_s.slice(-2,2) == chain.first.to_s.slice(0,2)
+          p chain.push(n)
+          exit
+        elsif edge.any?
+          search_cyclical(edge.dup, chain.dup.push(n))
+        end
+      end
     end
   end
 end
