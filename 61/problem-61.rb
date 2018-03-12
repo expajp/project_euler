@@ -16,14 +16,14 @@
 それぞれ多角数である: 三角数 (P3,127=8128), 四角数 (P4,91=8281), 五角数 (P5,44=2882) がそれぞれ別の数字で集合に含まれている
 4桁の数の組で上の2つの性質をもつはこの組だけである.
 三角数, 四角数, 五角数, 六角数, 七角数, 八角数が全て表れる6つの巡回する4桁の数からなる唯一の順序集合の和を求めよ.
-=end
 
-def cyclical?(arr)
-  arr.each_cons(2) do |i, j|
-    return false if i.to_s[2..3] != j.to_s[0..1]
-  end
-  true
-end
+
+順序付きの配列だが、最初の要素はなんでもよい
+よって、最初の要素を三角数に固定し、三角数を順に調べる
+深さ優先探索で、先頭2文字が一致するやつを順に調べて行って駄目なら手戻り
+調べたpolygonalを保持する配列を作り、手戻りしたら再度配列に値を追加
+
+=end
 
 @polygonal = []
 def set_polygonal  
@@ -58,20 +58,16 @@ def set_polygonal
   end
 end
 
-def polygonal?(n, i)
-  @polygonal[n].include?(i)
-end
-
 def search_cyclical(edge, chain)
   @polygonal[edge.shift].each do |n|
     if chain.empty?
-      p "#{edge.first-1} #{n}" if edge.any?
       search_cyclical(edge.dup, [n])      
     else
       if chain.last.to_s.slice(-2,2) == n.to_s.slice(0,2)
-        p "#{' '*(edge.first-3)}#{edge.first-1} #{n}" if edge.any?
         if edge.empty? && n.to_s.slice(-2,2) == chain.first.to_s.slice(0,2)
-          p chain.push(n)
+          chain.push(n)
+          p chain
+          p chain.inject(:+)
           exit
         elsif edge.any?
           search_cyclical(edge.dup, chain.dup.push(n))
@@ -82,16 +78,8 @@ def search_cyclical(edge, chain)
 end
 
 set_polygonal()
-# @polygonal.each{ |a| p a&.length }
 
-=begin
-順序付きの配列だが、最初の要素はなんでもよい
-よって、最初の要素を三角数に固定し、三角数を順に調べる
-深さ優先探索で、先頭2文字が一致するやつを順に調べて行って駄目なら手戻り
-調べたpolygonalを保持する配列を作り、手戻りしたら再度配列に値を追加
-=end
-
-edge = [*3..8]
-chain = []
-search_cyclical(edge, chain)
+edges = []
+[*4..8].permutation(5).each{ |a| edges.push(a.unshift(3)) }
+edges.each{ |edge| search_cyclical(edge, []) }
 
