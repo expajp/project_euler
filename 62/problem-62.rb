@@ -21,23 +21,54 @@ def cube?(n)
 end
 =end
 @cube = []
-def set_cubes(max)
-  1.upto(max){ |n| @cube.push(n**3) }
+def set_cubes(max_digits)
+  n = 1
+  loop do
+    cube = n**3
+    break if cube.to_s.length > max_digits
+    @cube.push(cube)
+    n += 1
+  end
 end
 
 def cube?(n)
   @cube.include?(n)
 end
 
-def permutation_numbers(n)
-  arr = n.to_s.split('').permutation(n.to_s.length).to_a.uniq
-  arr.map{ |a| a.inject(:+).to_i }
+def get_permutation(a)
+  return [] if a.nil? || a.length == 0
+  return [a] if a.length == 1
+  return [a, a.reverse] if a.length == 2
+  a.each do |v|
+    ret = []
+    arg = a.dup
+    arg.delete_at(arg.find_index(v))
+    get_permutation(arg).each do |b|
+      (b.length+1).times { |i| ret.push(b.dup.insert(i, v))}
+    end
+    return ret.uniq
+  end
 end
 
-set_cubes(1000)
-n = 5
+def permutation_numbers(n)
+  arr = n.to_s.split('')
+  arr = get_permutation(arr)
+  arr.select{ |a| a[0] != "0" }.map{ |a| a.inject(:+).to_i }
+end
+
+# p get_permutation([1,2,3])
+set_cubes(10)
+n = 345
 loop do
-  p "n = #{n}, n^3 = #{n**3}"
-  break if permutation_numbers(n**3).select{ |i| cube?(i) }.count == 5
+  cube = n**3
+  if !@cube.include?(cube)
+    n += 1
+    next
+  end
+  break if cube > @cube.max
+  perm = permutation_numbers(cube).select{ |i| cube?(i) }
+  p "n = #{n}, n^3 = #{cube}, count = #{perm.count}" if perm.count > 1
+  break if perm.count == 5
+  perm.each{ |i| @cube.delete(i) }
   n += 1
 end
