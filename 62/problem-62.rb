@@ -20,13 +20,16 @@ def cube?(n)
   end
 end
 =end
-@cube = []
+@cube = Hash.new
 def set_cubes(max_digits)
   n = 1
   loop do
     cube = n**3
     break if cube.to_s.length > max_digits
-    @cube.push(cube)
+    hash = Hash.new
+    cube.to_s.split('').each{ |c| hash[c] = (hash.key?(c) ? hash[c]+1 : 1) }
+    p hash
+    @cube[cube.to_s] = hash
     n += 1
   end
 end
@@ -57,18 +60,14 @@ def permutation_numbers(n)
 end
 
 # p get_permutation([1,2,3])
-set_cubes(10)
+set_cubes(8)
+
 n = 345
 loop do
   cube = n**3
-  if !@cube.include?(cube)
-    n += 1
-    next
-  end
-  break if cube > @cube.max
-  perm = permutation_numbers(cube).select{ |i| cube?(i) }
-  p "n = #{n}, n^3 = #{cube}, count = #{perm.count}" if perm.count > 1
-  break if perm.count == 5
-  perm.each{ |i| @cube.delete(i) }
+  len = @cube.length
+  p "n = #{n}, n^3 = #{cube}, len = #{len}"
+  @cube.delete(@cube[cube.to_s])
+  break if len - @cube.length >= 1
   n += 1
 end
