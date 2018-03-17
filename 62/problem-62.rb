@@ -10,65 +10,36 @@
 立方数かどうかの判定は、その数の３乗根に天井関数を適用
 =end
 
-=begin
-def cube?(n)
-  m = 1
-  loop do
-    return false if m**3 > n
-    return true if m**3 == n
-    m += 1
-  end
-end
-=end
 @cube = []
 def set_cubes(max_digits)
   n = 1
   loop do
     cube = n**3
-    break if cube.to_s.length > max_digits
-    @cube.push(cube)
+    cube_len = cube.to_s.length
+    break if cube_len > max_digits
+    @cube[cube_len] ||= []
+    @cube[cube_len].push(cube.to_s.split(''))
     n += 1
   end
 end
 
-def cube?(n)
-  @cube.include?(n)
-end
-
-def get_permutation(a)
-  return [] if a.nil? || a.length == 0
-  return [a] if a.length == 1
-  return [a, a.reverse] if a.length == 2
-  a.each do |v|
-    ret = []
-    arg = a.dup
-    arg.delete_at(arg.find_index(v))
-    get_permutation(arg).each do |b|
-      (b.length+1).times { |i| ret.push(b.dup.insert(i, v))}
+set_cubes(12)
+result = []
+@cube.each_with_index do |digits, i|
+  result[i] ||= {}
+  next if @cube[i].nil?
+  digits.each do |arr_n|
+    n = arr_n.sort.inject(:+)
+    if result[i].key?(n)
+      result[i][n].push(arr_n.inject(:+))
+    else
+      result[i][n] = [arr_n.inject(:+)]
     end
-    return ret.uniq
   end
 end
 
-def permutation_numbers(n)
-  arr = n.to_s.split('')
-  arr = get_permutation(arr)
-  arr.select{ |a| a[0] != "0" }.map{ |a| a.inject(:+).to_i }
-end
-
-# p get_permutation([1,2,3])
-set_cubes(10)
-n = 345
-loop do
-  cube = n**3
-  if !@cube.include?(cube)
-    n += 1
-    next
-  end
-  break if cube > @cube.max
-  perm = permutation_numbers(cube).select{ |i| cube?(i) }
-  p "n = #{n}, n^3 = #{cube}, count = #{perm.count}" if perm.count > 1
-  break if perm.count == 5
-  perm.each{ |i| @cube.delete(i) }
-  n += 1
+result.each do |h|
+  next if h.nil?
+  output =  h.select{ |k,v| v.length >= 5 }
+  p output if output.any?
 end
