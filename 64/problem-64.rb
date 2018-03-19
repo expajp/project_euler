@@ -61,5 +61,24 @@ N ≤ 10000 について奇数の周期をもつ平方根が何個あるか答�
 を行うトップレベルメソッドを実装し、周期的な変化を観測できるようにするのが最初の一歩
 =end
 
+def get_int_part_of_sqrt(n)
+  Math.sqrt(n).floor.to_i  
+end
 
+def get_into_rational(root, int)
+  denomi = root - int*int
+  left = (get_int_part_of_sqrt(root)+int)/denomi
+  new_int = (denomi - int).abs
 
+  return { "left": left, "denomi": denomi, "root": root, "int": new_int } # left, denomi, root, int
+end
+
+def get_str_hash(h)
+  "#{h[:left]} + (sqrt(#{h[:root]})-#{h[:int]}) / #{h[:denomi]}"
+end
+
+h = {"root": 23, "int": 4}
+10.times do |i|
+  h = get_into_rational(h[:root], h[:int])
+  p get_str_hash(h)
+end
