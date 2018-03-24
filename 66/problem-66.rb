@@ -32,9 +32,9 @@ answer = 0
   p "D=#{d}"
   next if square?(d)
   catch(:foo) do
-    y = 1
+    x = 1
     loop do
-      x = answer_x
+      y = x
       loop do
         f = x*x-d*y*y
         # p "x=#{x}, y=#{y}, f=#{f}"
@@ -47,9 +47,14 @@ answer = 0
           p "D=#{d}, x=#{x}, y=#{y}"
           throw :foo
         end
-        x += 1
+        if f < -(x*x)
+          y -= d
+        else
+          y -= 1
+        end
+        break if y < 1
       end   
-      y += 1
+      x += 1
     end
   end
 end
