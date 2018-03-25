@@ -19,6 +19,13 @@ D = {2, 3, 5, 6, 7} に対して x を最小にする解は次のようになる
 したがって, D ≤ 7 に対して x を最小にする解を考えると, D=5 のとき x は最大である.
 
 D ≤ 1000 に対する x を最小にする解で, x が最大になるような D の値を見つけよ.
+
+x - d
+ odd - odd  y = even
+ odd - even y = any
+even - odd  y = odd
+even - even y nothing
+
 =end
 
 def square?(n)
@@ -32,9 +39,10 @@ answer = 0
   p "D=#{d}"
   next if square?(d)
   catch(:foo) do
-    x = 1
+    x = 3
+    
     loop do
-      y = x
+      y = x-1
       loop do
         f = x*x-d*y*y
         # p "x=#{x}, y=#{y}, f=#{f}"
@@ -47,14 +55,20 @@ answer = 0
           p "D=#{d}, x=#{x}, y=#{y}"
           throw :foo
         end
-        if f < -(x*x)
-          y -= d
-        else
+
+        if x%2 == 1 && d%2 == 0
           y -= 1
+        else
+          y -= 2
         end
         break if y < 1
-      end   
-      x += 1
+      end
+      
+      if d%2 == 0
+        x += 1
+      else
+        x += 2
+      end
     end
   end
 end
