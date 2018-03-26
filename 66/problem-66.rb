@@ -42,24 +42,26 @@ answer_x = 0
 answer = 0
 
 2.upto(1000) do |d|
-  p "D=#{d}"
+  # p "D=#{d}"
   next if square?(d)
-  x = (d%2 == 0 ? 1 : 2)
+  x = 2
   
   loop do
-    quot = (x*x-1)/d
-    mod = (x*x-1)%d
-    p "x = #{x}, quot = #{quot}, mod = #{mod}" if mod == 0
-    if mod == 0 && square?(quot)
+    elm = x*x-1
+    mod = elm%d
+    quot = elm/d
+    # p "x = #{x}, quot = #{quot}, mod = #{mod}" if mod == 0
+    if mod == 0 && quot != 0 && square?(quot)
       if answer_x < x
         answer_x = x
         answer = d
-        p "D = #{d}, x = #{x}, y = #{Math.sqrt(quot).to_i}"
       end
+      p "D = #{d}, x = #{x}, y = #{Math.sqrt(quot).to_i}"
       break
     else
-      x += (d%2 == 0 ? 2 : 1)
+      x += 1 #(d%2 == 0 ? 2 : 1)
     end
   end
 end
 p "asnwer = #{answer}, answer_x = #{answer_x}"
+
