@@ -26,6 +26,12 @@ x - d
 even - odd  y = odd
 even - even y nothing
 
+xを順に増やしていくのは仕方ない
+yを探索するコストをどうにか減らしたい
+(x^2-1)/D = y^2
+->yが整数で平方数ならそのyが正解
+あっ……
+
 =end
 
 def square?(n)
@@ -38,37 +44,22 @@ answer = 0
 2.upto(1000) do |d|
   p "D=#{d}"
   next if square?(d)
-  catch(:foo) do
-    x = 3
-    
-    loop do
-      y = x-1
-      loop do
-        f = x*x-d*y*y
-        # p "x=#{x}, y=#{y}, f=#{f}"
-        break if f > 1
-        if f == 1
-          if answer_x < x
-            answer_x = x
-            answer = d
-          end
-          p "D=#{d}, x=#{x}, y=#{y}"
-          throw :foo
-        end
-
-        if x%2 == 1 && d%2 == 0
-          y -= 1
-        else
-          y -= 2
-        end
-        break if y < 1
+  x = (d%2 == 0 ? 1 : 2)
+  
+  loop do
+    quot = (x*x-1)/d
+    mod = (x*x-1)%d
+    p "x = #{x}, quot = #{quot}, mod = #{mod}" if mod == 0
+    if mod == 0 && square?(quot)
+      if answer_x < x
+        answer_x = x
+        answer = d
+        p "D = #{d}, x = #{x}, y = #{Math.sqrt(quot).to_i}"
       end
-      
-      if d%2 == 0
-        x += 1
-      else
-        x += 2
-      end
+      break
+    else
+      x += (d%2 == 0 ? 2 : 1)
     end
   end
 end
+p "asnwer = #{answer}, answer_x = #{answer_x}"
