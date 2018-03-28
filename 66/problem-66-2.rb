@@ -49,10 +49,14 @@ end
 
 def get_convergent(arr)
   answer = { "elm": 1, "denomi": 0 }
+  int = arr.shift
+  # p "int = #{int}, arr = #{arr}"
   rev = arr.reverse
   rev.each do |i|
     answer = { "elm": answer[:denomi]+answer[:elm]*i, "denomi": answer[:elm] }
+    # p get_str_convergent(answer)
   end
+  answer = { "elm": answer[:denomi]+answer[:elm]*int, "denomi": answer[:elm] }
   answer
 end
 
@@ -61,25 +65,44 @@ def get_str_convergent(answer)
 end
 
 answer = 0
+answer_x = 0
 n = 2
 loop do
   h = {"root": n, "int": get_int_part_of_sqrt(n), "denomi": 1}
-  
-  arr = []
+
+  seed = { "elm": 0, "denomi": 0 }
+  square_flg = false
+  arr = [h[:int]]
   log = []
   loop do
     previous_h = h.dup
     h = get_into_rational(h[:root], h[:int], h[:denomi])
     if log.any?{ |log| log == h }
-      p "n=#{n}, #{arr}"
-      p get_str_convergent(get_convergent(arr))
+      square_flg = true if arr.length%2 == 0
+      arr.delete_at(arr.length-1) if arr.length != 2
+      # p "n=#{n}, #{arr}"
+      seed = get_convergent(arr)
       break
     end
     arr.push(h[:left])
     log.push(h.dup)
   end
-  
+
+  x = seed[:elm]
+  y = seed[:denomi]
+  if square_flg
+    x = x*x
+    y = y*y
+  end
+  if answer_x < x
+    answer_x = x
+    answer = n
+  end
+  p "#{get_str_convergent(seed)}, square_flg = #{square_flg}"
+    
   n += 1
   n += 1 if square?(n) # 次の数が平方数ならスキップ
-  break if n > 10
+  break if n > 1000
 end
+
+p "answer_x = #{answer_x}, answer = #{answer}"
