@@ -25,13 +25,13 @@ p_068_1.gif
 (注, 3つの場合の例を見ても分かる通り, 列の始まりの数字を比べた時一番小さい数字で始まる列から時計回りに繋げるという条件のもとで文字列を生成する必要があります. この条件下で最大となる数字を答えてください. )
 =end
 
-def output(inner, outer)
+def output(inner, outer, sum)
   len = inner.length
   str = ""
   len.times do |i|
     str += " #{outer[i]},#{inner[i]},#{inner[(i+1)%len]};"
   end
-  p (outer[0] + inner[0] + inner[1]).to_s + str
+  p sum.to_s + str + ' ' + str.gsub(/[,; ]/, '')
 end
 
 def check(inner, outer)
@@ -42,14 +42,23 @@ def check(inner, outer)
     return if arr.length != 0 && arr.last != sum
     arr.push(sum)
   end
-  output(inner, outer)
+  output(inner, outer, arr.last)
+end
+
+def create_outer(raw)
+  outer = []
+  raw.sort!
+  outer.push(raw.shift)
+  outer.push(raw.sort!{ |a, b| b <=> a })
+  outer.flatten
 end
 
 max = 10
 nums = [*1..max]
 outers = nums.combination(max/2).to_a # outerをcombinationで取ることで同じ和の最小値のみを出力
 
-outers.each do |outer|
+outers.each do |raw_outer|
+  outer = create_outer(raw_outer)
   inners = (nums.dup - outer).permutation(max/2)
   inners.each do |inner|
     check(inner, outer)
