@@ -60,19 +60,17 @@ def permutation?(n, m)
   arr.include?(m)
 end
 
-max = 1000000
+max = 10**7
 @primes = primes(max)
-
 answer = max
-2.upto(max) do |i|
-  f = totient(i)
-  next if i.to_s.length != f.to_s.length
-  if permutation?(i, f)
-    g = i/f.to_f
-    if g < answer
-      answer = g
-      p "phi(#{i})=#{f}, #{i}/phi(#{f})=#{g}"
-    end
+combi_primes = @primes.combination(2).to_a
+
+combi_primes.each do |combi|
+  pp = combi.inject(:*) # primes_product
+  f = pp/totient(pp).to_f
+  if f < answer
+    p "combi = #{combi}, pp = #{pp}, f = #{f}"
+    answer = pp
   end
 end
-
+p answer
