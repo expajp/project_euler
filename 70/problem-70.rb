@@ -29,47 +29,25 @@ def primes(max)
   3.step(Math.sqrt(max).floor, 2) do |i|
     ret.push(i) if prime?(i)
   end
-  return ret
-end
-
-def prime_factors(n)
-  ret = []
-  @primes.each do |p|
-    while n%p == 0 do
-      n = n/p
-      ret.push(p)
-    end
-  end
-  ret.uniq
-end
-
-def totient(n)
-  return n-1 if prime?(n) # [*1..n-1] if prime?(n)
-
-  ret = n
-  pfs = prime_factors(n)
-  pfs.each do |pf|
-    ret = ret*(pf-1)/pf 
-  end
   ret
 end
 
 def permutation?(n, m)
   arr = n.to_s.split('').permutation(n.to_s.length).to_a.select{ |a| a[0] != 0 }.map{ |a| a.inject(:+).to_i }
-  # p arr
   arr.include?(m)
 end
 
 max = 10**7
-@primes = primes(max)
 answer = max
-combi_primes = @primes.combination(2).to_a
+combi_primes = primes(max).combination(2).to_a
 
 combi_primes.each do |combi|
   pp = combi.inject(:*) # primes_product
-  f = pp/totient(pp).to_f
+  t = combi.inject{ |p, q| (p-1)*(q-1) }
+  next unless permutation?(pp, t)
+  f = pp/t.to_f
   if f < answer
-    p "combi = #{combi}, pp = #{pp}, f = #{f}"
+    p "combi = #{combi}, pp = #{pp}, t = #{t}, f = #{f}"
     answer = pp
   end
 end
