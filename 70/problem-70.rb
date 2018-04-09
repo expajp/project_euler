@@ -10,45 +10,43 @@
 1 < n < 107 で φ(n) が n を置換したものになっているもののうち, n/φ(n) が最小となる n を求めよ.
 =end
 
-def prime?(n)
-  return false if n <= 1
-  return true if n == 2
-  return false if n != 2 && n % 2 == 0
- 
-  limit = Math.sqrt(n).ceil
-  3.step(limit, 2) do |i|
-    return false if n % i == 0
-  end
-
-  return true
-end
+require 'prime'
 
 def primes(max)
-  return [] if max < 2
-  ret = [2]
-  3.step(Math.sqrt(max).floor, 2) do |i|
-    ret.push(i) if prime?(i)
-  end
+  ret = []
+  Prime.each(max/2){ |p| ret.push(p) }
   ret
 end
 
 def permutation?(n, m)
-  arr = n.to_s.split('').permutation(n.to_s.length).to_a.select{ |a| a[0] != 0 }.map{ |a| a.inject(:+).to_i }
-  arr.include?(m)
+  return false if n.to_s.length != m.to_s.length
+  arr = m.to_s.split('')
+  n.to_s.split('').each do |d|
+    idx = arr.index(d)
+    return false if idx.nil?
+    arr.delete_at(idx)
+  end
+  arr == []
 end
 
 max = 10**7
-answer = max
-combi_primes = primes(max).combination(2).to_a
+answer_f = max
+answer = 1
+primes = Prime::EratosthenesGenerator.new.take(Math.sqrt(max).floor/2)
+combi_primes = primes.combination(2).to_a.select{ |a| a.inject(:*) < max }
+# p combi_primes
 
 combi_primes.each do |combi|
   pp = combi.inject(:*) # primes_product
   t = combi.inject{ |p, q| (p-1)*(q-1) }
-  next unless permutation?(pp, t)
   f = pp/t.to_f
-  if f < answer
+  next if answer_f < f
+  next unless permutation?(pp, t)
+  if f < answer_f
     p "combi = #{combi}, pp = #{pp}, t = #{t}, f = #{f}"
+    answer_f = f
     answer = pp
   end
 end
-p answer
+p "answer=#{answer}, answer_f=#{answer_f}"
+
