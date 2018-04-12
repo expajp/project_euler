@@ -23,14 +23,33 @@ def hcf(n, m)
   hcf(m%n, n)
 end
 
+def compare_with_frac(base_frac, frac)
+  n = frac[0]*base_frac[1]
+  compared_n = base_frac[0]*frac[1]
+
+  return 0 if n == compared_n
+  n-compared_n > 0 ? 1 : -1
+end
+
+def get_max_of_elm
+  d = 1000000
+  loop do
+    break if d%7 ==0
+    d += 1
+  end
+  (d/7)*3
+end
+
 def get_rpfs(max_d)
   arr = []
-  2.upto(max_d) do |d|
+  3.upto(max_d) do |d|
     1.upto(d-1) do |n|
+      break if compare_with_frac([3,7],[n,d]) > 0
+      next if compare_with_frac([428574,1000000],[n,d]) < 0
       arr.push([n,d]) if hcf(n,d) == 1
     end
   end
   arr
 end
 
-p get_rpfs(10000).length
+p get_rpfs(100000).length
