@@ -31,25 +31,12 @@ def compare_with_frac(base_frac, frac)
   n-compared_n > 0 ? 1 : -1
 end
 
-def get_max_of_elm
-  d = 1000000
-  loop do
-    break if d%7 ==0
-    d += 1
-  end
-  (d/7)*3
-end
-
-def get_rpfs(max_d)
-  arr = []
-  3.upto(max_d) do |d|
-    1.upto(d-1) do |n|
-      break if compare_with_frac([3,7],[n,d]) > 0
-      next if compare_with_frac([428574,1000000],[n,d]) < 0
-      arr.push([n,d]) if hcf(n,d) == 1
+max = 40
+1.upto(max/7) do |d_div|
+  (d_div*7).upto(d_div*7+6) do |d|
+    (d_div*2+1).upto(d_div*3-1) do |n|
+      p "#{n}/#{d}"
+      break if compare_with_frac([n,d], [3,7]) > 0
     end
-  end
-  arr
+  end 
 end
-
-p get_rpfs(100000).length
