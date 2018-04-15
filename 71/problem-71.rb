@@ -31,12 +31,19 @@ def compare_with_frac(base_frac, frac)
   n-compared_n > 0 ? 1 : -1
 end
 
-max = 40
+max = 1000000
+answer_div = max
+answer = [1,1]
 1.upto(max/7) do |d_div|
   (d_div*7).upto(d_div*7+6) do |d|
     (d_div*2+1).upto(d_div*3-1) do |n|
-      p "#{n}/#{d}"
+      if 3/7.0-n/d.to_f < answer_div
+        answer_div = 3/7.0-n/d.to_f
+        answer = [n,d]
+        p "answer_div = #{answer_div}, answer = #{answer}"
+      end
       break if compare_with_frac([n,d], [3,7]) > 0
     end
   end 
 end
+p "answer_div = #{answer_div}, answer = #{answer}"
