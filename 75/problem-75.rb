@@ -31,25 +31,26 @@ def hcf(n,m)
   hcf(m%n, n)
 end
 
-once = []
-twice_or_more = []
+l_arr = []
 
 max = 1500000
 2.upto(Math.sqrt(max/2).floor) do |m|
   (m%2+1).step(m-1, 2) do |n|
     next if hcf(n, m) != 1
     l = 2*m*(m+n)
-    break if l >= max
-    # p "m=#{m}, n=#{n}, l=#{l}"
-    unless twice_or_more.include?(l)
-      unless once.include?(l)
-        once.push(l)
-      else
-        once.delete(l)
-        twice_or_more.push(l)
-      end
+    break if l >= max || l_arr.include?(l)
+    p "m = #{m}, n = #{n}, l = #{l}"
+    if l == 12
+      l_arr = [*1..(max/l).floor].map{ |i| i*l }
+    elsif l == 30
+      l_arr.push([*1..(max/l).floor].map{ |i| i*l }).flatten
+    else
+      [*1..(max/l).floor].map{ |i| i*l }.each { |j| l_arr.push(j) }
     end
   end
 end
+l_arr_uniq = l_arr.uniq
+twice_or_more = (l_arr - l_arr_uniq).uniq
+once = l_arr_uniq - twice_or_more
 
 p "answer = #{once.length}"
