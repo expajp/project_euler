@@ -38,19 +38,26 @@ max = 1500000
   (m%2+1).step(m-1, 2) do |n|
     next if hcf(n, m) != 1
     l = 2*m*(m+n)
-    break if l >= max || l_arr.include?(l)
-    p "m = #{m}, n = #{n}, l = #{l}"
-    if l == 12
-      l_arr = [*1..(max/l).floor].map{ |i| i*l }
-    elsif l == 30
-      l_arr.push([*1..(max/l).floor].map{ |i| i*l }).flatten
+    break if l >= max
+    # p "m = #{m}, n = #{n}, l = #{l}"
+    if l < 100
+      l_arr.push([*1..(max/l).floor].map{ |i| i*l }).flatten!
     else
       [*1..(max/l).floor].map{ |i| i*l }.each { |j| l_arr.push(j) }
     end
   end
 end
-l_arr_uniq = l_arr.uniq
-twice_or_more = (l_arr - l_arr_uniq).uniq
-once = l_arr_uniq - twice_or_more
+
+h = {}
+l_arr.each do |i|
+  if h.has_key?(i)
+    h[i] += 1
+  else
+    h[i] = 1
+  end
+end
+
+twice_or_more = h.select{ |k, v| v > 1 }.keys.map{ |k| k.to_i }
+once = l_arr - twice_or_more
 
 p "answer = #{once.length}"
