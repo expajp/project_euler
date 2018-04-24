@@ -14,12 +14,23 @@
 2つ以上の正整数の和としての100の表し方は何通りか.
 =end
 
-@patterns = [nil, 1] 
+@patterns = [nil, 0]
 
 # snp = sum notation patterns
 def snp(n)
   return @patterns[n] unless @patterns[n].nil?
-  @patterns[n] = [*1..n-1].map{ |i| snp(i) }.inject(:+)
+  @patterns[n] = [*1..(n/2).ceil].map{ |i| 1+snp(n-i) }.inject(:+)
+  [*(n/2).ceil+1..n-1].each do |i|
+    if n-i < i
+      p snp(n-i)
+      @patterns[n] += snp(n-i)
+      @patterns[n] += 1 if n-i == 1
+    else
+      div = n/i
+      mod = n%i
+      p "div=#{div}, mod=#{mod}"
+    end
+  end
   p "@patterns[#{n}] = #{@patterns[n]}"
   @patterns[n]
 end
