@@ -15,15 +15,20 @@
 =end
 
 @patterns = [nil, 0]
+@gpfnah = []
 
 # get patterns from n and h
 def gpfnah(n, h)
-  p "n: #{n}, h: #{h}"
-  return 1 if h == 1 || n == 1 || n == h
+  return @gpfnah[n][h] unless @gpfnah[n].nil? || @gpfnah[n][h].nil?
+  return 1 if h == 1
   ret = 0
   [*1..n/h].each do |i|
-    ret += gpfnah(n-h*i, h-1)
+    [*1..h-1].each do |j|
+      ret += gpfnah(n-h*i, h-j)
+    end
   end
+  @gpfnah[n] = [] if @gpfnah[n].nil?
+  @gpfnah[n][h] = ret
   return ret
 end
 
@@ -32,16 +37,13 @@ def snp(n)
   return @patterns[n] unless @patterns[n].nil?
   @patterns[n] = 0
   [*1..(n/2).floor].each do |i|
-    p "#{n}: a. #{snp(i)+1}"
     @patterns[n] += snp(i)+1
   end
   [*(n/2).floor+1..n-1].each do |i|
     pt = gpfnah(n, n-i)
-    p "#{n}: b. #{pt}"
     @patterns[n] += pt
   end
-  p "@patterns[#{n}] = #{@patterns[n]}"
   @patterns[n]
 end
 
-p snp(7)
+p snp(100)
