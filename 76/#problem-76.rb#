@@ -19,7 +19,7 @@
 # get patterns from n and h
 def gpfnah(n, h)
   p "n: #{n}, h: #{h}"
-  return 1 if h == 1 || n == 1 || n == h
+  return 1 if h == 1 || n == 1
   ret = 0
   [*1..n/h].each do |i|
     ret += gpfnah(n-h*i, h-1)
