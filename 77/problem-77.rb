@@ -19,18 +19,21 @@ require 'prime'
 
 # get primes patterns
 def gpp(n, h)
-  return 0 if n == 1 || n < h
-  p "n:#{n} h:#{h}"
-  if n%h == 0
-    p "count!"
+  if n == h || (n != 0 && h == 2 && n%h == 0)
+    # p "n:#{n} h:#{h}"
+    # p "count!"
     return 1
   end
+  return 0 if n == 1 || n < h
+  # p "n:#{n} h:#{h}"
   ret = 0
   [*1..n/h].each do |q|
-    break if n-h*q == 0
-    primes_under(h).reverse.each do |i|
+    if q == n/h && n-h*q == 0
+      ret += 1
+      break
+    end
+    primes_under(h-1).reverse.each do |i|
       ret += gpp(n-h*q, i)
-      break if (n-h*q)%i == 0
     end
   end
   ret
@@ -43,15 +46,15 @@ def primes_under(n)
 end
 
 def prime_sums(n)
-  primes_under(n).reverse.map{ |p| gpp(n, p) }.sum
+  primes_under(n-1).reverse.map{ |p| gpp(n, p) }.sum
 end
 
-i = 11
+i = 10
 patterns = 0
 loop do
   patterns = prime_sums(i)
   p "i=#{i}, patterns = #{patterns}"
-  break if patterns > 4
+  break if patterns > 5000
   i += 1
 end
 p "answer = #{i}"
