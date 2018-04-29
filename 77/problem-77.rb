@@ -15,25 +15,16 @@
 
 require 'prime'
 
-@gpfnah = []
-
 # get primes patterns
 def gpp(n, h)
-  if n == h || (n != 0 && h == 2 && n%h == 0)
-    # p "n:#{n} h:#{h}"
-    # p "count!"
-    return 1
-  end
-  return 0 if n == 1 || n < h
+  return 0 if n == 1 || (n < h && n != 0)
+  return 1 if n == 0 || (h == 2 && n%h == 0)
   # p "n:#{n} h:#{h}"
   ret = 0
   [*1..n/h].each do |q|
-    if q == n/h && n-h*q == 0
-      ret += 1
-      break
-    end
     primes_under(h-1).reverse.each do |i|
       ret += gpp(n-h*q, i)
+      break if q == n/h && n-h*q == 0 # n%q == 0のケースは2度以上カウントしない
     end
   end
   ret
@@ -50,11 +41,11 @@ def prime_sums(n)
 end
 
 i = 10
-patterns = 0
+border = 5000
 loop do
   patterns = prime_sums(i)
   p "i=#{i}, patterns = #{patterns}"
-  break if patterns > 5000
+  break if patterns > border
   i += 1
 end
 p "answer = #{i}"
