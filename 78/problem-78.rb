@@ -19,6 +19,21 @@ OO   O   O   O
 O   O   O   O   O
 
 p(n) が100万で割り切れる場合に最小となる n を求めよ.
+
+---
+総当りは無理、桁が大きくなりすぎていて限界が来る
+
+https://en.wikipedia.org/wiki/Partition_(number_theory)
+
+どうやら、分配関数（Partition function）を利用するようだ
+日本語には整数に関するこの単語のページはない
+
+分配関数を陽的に求める方法はここにある
+http://mathworld.wolfram.com/PartitionFunctionP.html
+
+これを実装する方針で進めればよい
+結局、末尾6桁が0であればよいので、それより上を切っては足しを繰り返せればよい
+つまり、必要なのは陽的に求める式から漸化式を導くことである
 =end
 
 @gpfnah = []
