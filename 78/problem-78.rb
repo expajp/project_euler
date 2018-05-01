@@ -34,6 +34,17 @@ http://mathworld.wolfram.com/PartitionFunctionP.html
 これを実装する方針で進めればよい
 結局、末尾6桁が0であればよいので、それより上を切っては足しを繰り返せればよい
 つまり、必要なのは陽的に求める式から漸化式を導くことである
+
+---
+オイラーの五角数定理から、分割関数の漸化式が導かれる
+
+product(0, inf){1-x^n)} = sum(-inf, inf){ (-1)^n*x^(n(3n-1)/2) }
+
+nの偶数個への分割をP0(n), 奇数個への分割をP1(n)とすると、
+
+P0(n)-P1(n) = (-1)^k ( if n = (3k pm 1)/2 )\\ 0 (otherwise)
+
+
 =end
 
 @gpfnah = []
