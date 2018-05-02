@@ -38,39 +38,59 @@ http://mathworld.wolfram.com/PartitionFunctionP.html
 ---
 オイラーの五角数定理から、分割関数の漸化式が導かれる
 
-product(0, inf){1-x^n)} = sum(-inf, inf){ (-1)^n*x^(n(3n-1)/2) }
+product(1, inf){1-x^n} = sum(-inf, inf){ (-1)^n*x^(n(3n-1)/2) }
 
 nの偶数個への分割をP0(n), 奇数個への分割をP1(n)とすると、
 
 P0(n)-P1(n) = (-1)^k ( if n = (3k pm 1)/2 )\\ 0 (otherwise)
 
+また、|x| < 1とみなして無限級数を考えると、
+1+x+x^2+... = 1/(1-x)
+なので、これを使って分配関数の母関数を変換し、
+さらにオイラーの五角数定理を使うと
+
+G(x)(1-x-x^2+x^5+x^7+x^12-...) = 1
+G(x)(product(1, inf){1-x^n}) = 1
+G(x) = product(1, inf){1-x^n}^(-1)
+p(0)+p(1)x+p(2)x^2+... = product(1, inf){1-x^n}^(-1)
+
+恒等式として解くと
+p(n) = p(n-1) + p(n-2) + p(n-5) + ...
+
+こちらに日本語で詳しい解説が載っている
+http://d.hatena.ne.jp/inamori/20121216/p1
 
 =end
 
-@gpfnah = []
-
-# get patterns from n and h
-def gpfnah(n, h)
-  return @gpfnah[n][h] unless @gpfnah[n].nil? || @gpfnah[n][h].nil?
-  return 1 if h == 1
-  @gpfnah[n] = [] if @gpfnah[n].nil?
-  @gpfnah[n][h] = [*1..n/h].map{ |i| [*1..h-1].map{ |j| gpfnah(n-h*i, h-j) }.sum }.sum
+def pentagonal_under(n)
+  ret = []
+  i = 1
+  loop do
+    break if (negative = i*(3*i-1)/2) >= n
+    ret << negative
+    break if (positive = i*(3*i+1)/2) >= n
+    ret << positive    
+    i += 1
+  end
+  ret
 end
 
-def piles(n)
-  1+[*1..n-1].map{ |i| gpfnah(n, n-i)}.sum
-end
-
-n = 5
+n = 2
+answer = 0
+p = [1, 1]
+pentagonal = pentagonal_under(100000)
 loop do
-  pile = piles(n)
+  p[n] = 0
+  pentagonal.each_with_index do |penta, i|
+    break if n-penta < 0
+    sign = (i%4 <= 1 ? 1 : -1)
+    # p "penta: #{penta}, i: #{i}, sign: #{sign}, p[n-penta]: #{p[n-penta]}"
+    p[n] += sign*p[n-penta]
+  end
+  p[n] = p[n] % 1000000
+  # p "p[#{n}] % 1000000 = #{p[n]}"
+  break if p[n] == 0
   n += 1
-  next if pile < 1000000
-  next if pile % 100 != 0
-  p "pile = #{pile}, n = #{n-1}"
-  next if pile % 10000 != 0
-  next if pile % 1000000 != 0
-  break
+  break if n > pentagonal.max
 end
-p "pile = #{pile}, n = #{n-1}"
-
+p "answer = #{n}"
