@@ -20,7 +20,27 @@ File.open("keylog.txt") do |f|
     line.gsub!(/\n/, "")
     arr = []
     line.each_char{ |c| arr << c }
-    keylog << arr
+    arr.each_cons(2){ |con| keylog << con }
   end
 end
+
 p keylog
+answer = []
+keylog.each do |log|
+  idx = log.map{ |n| answer.index(n) }
+  if idx.map(&:nil?).inject(:&)
+    answer.push(log).flatten!
+  elsif idx.include?(nil)
+    new_val = log[idx.index(nil)]
+    if 1-idx.index(nil) == 0
+      answer.push(new_val)
+    else
+      answer.unshift(new_val)
+    end
+  else
+    # ここが一番厄介
+    # 両方存在する場合、前後関係の修正で対処できない場合は追加
+    # 前後関係の修正で対処できないという判定はどこでするんだろうか。。。
+  end
+end
+p answer.inject(:+)
