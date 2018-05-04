@@ -38,9 +38,11 @@ keylog.each do |log|
       answer.unshift(new_val)
     end
   else
-    # ここが一番厄介
-    # 両方存在する場合、前後関係の修正で対処できない場合は追加
-    # 前後関係の修正で対処できないという判定はどこでするんだろうか。。。
+    if idx[0] < idx[1]
+      # do nothing
+    else
+      answer.push(log[1])
+    end
   end
 end
 p answer.inject(:+)
