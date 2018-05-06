@@ -24,9 +24,8 @@ File.open("keylog.txt") do |f|
   end
 end
 
-p keylog
 answer = []
-keylog.each do |log|
+keylog.each_with_index do |log, i|
   idx = log.map{ |n| answer.index(n) }
   if idx.map(&:nil?).inject(:&)
     answer.push(log).flatten!
@@ -44,5 +43,7 @@ keylog.each do |log|
       answer.push(log[1])
     end
   end
+  p "log=#{log}, i=#{i}, answer=#{answer.inject(:+)}"
+  break if i == 25
 end
 p answer.inject(:+)
