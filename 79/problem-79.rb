@@ -40,10 +40,14 @@ keylog.each_with_index do |log, i|
     if idx[0] < idx[1]
       # do nothing
     else
-      answer.push(log[1])
+      if answer.slice(idx[0], answer.length-idx[0]-1).index(log[1]).nil?
+        # p answer.slice(idx[0], answer.length-idx[0])
+        # p answer.slice(idx[0], answer.length-idx[0]).index(log[1]).nil?
+        answer.push(log[1])
+      end
     end
   end
   p "log=#{log}, i=#{i}, answer=#{answer.inject(:+)}"
-  break if i == 25
+  # break if i == 25
 end
 p answer.inject(:+)
