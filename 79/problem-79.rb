@@ -24,7 +24,21 @@ File.open("keylog.txt") do |f|
   end
 end
 
-answer = []
+def add_digits(material, digits)
+  ret = []
+  [*0..material.length].combination(2).to_a.each do |c|
+    arr = material.dup
+    arr.insert(c[0], digits[0])
+    arr.insert(c[1]+1, digits[1])
+    ret.push(arr)
+  end
+  ret
+end
+
+p add_digits([0, 1, 2], [3, 4])
+
+# answer = []
+=begin
 keylog.each_with_index do |log, i|
   idx = log.map{ |n| answer.index(n) }
   if idx.map(&:nil?).inject(:&)
@@ -40,9 +54,7 @@ keylog.each_with_index do |log, i|
     if idx[0] < idx[1]
       # do nothing
     else
-      if answer.slice(idx[0], answer.length-idx[0]-1).index(log[1]).nil?
-        # p answer.slice(idx[0], answer.length-idx[0])
-        # p answer.slice(idx[0], answer.length-idx[0]).index(log[1]).nil?
+      if answer.slice(idx[0], answer.length-idx[0]).index(log[1]).nil?
         answer.push(log[1])
       end
     end
@@ -51,3 +63,5 @@ keylog.each_with_index do |log, i|
   # break if i == 25
 end
 p answer.inject(:+)
+=end
+
