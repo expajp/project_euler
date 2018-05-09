@@ -37,13 +37,31 @@ def add_digits(material, digits)
   ret
 end
 
-answer = []
+answers = []
 
-keylog.each do |log|
-  answer.push(log) if answer.length == 0
-  # 両方存在しない場合はdigitsに2つとも放り込む
-  # 片方だけ存在するは数字より前or後ろだけmaterialにしてdigitsに1つ放り込む
-  # 両方順番通りに存在する場合はそのまま
-  # 両方存在するけど順番通りでない場合は片方をそのままにするパターンを2通り考える
+keylog.each_with_index do |log, i|
+  p "log=#{log}"
+  if answers.length == 0
+    answers.push(log)
+    next
+  end
+  p "answers=#{answers}"
+  new_answers = []
+  answers.each do |ans|
+    idx = log.map{ |l| ans.index(l) }
+    p "idx=#{idx}"
+    if idx.all?{ |i| i.nil? }
+      add_digits(ans, log).each{ |new_ans| new_answers << new_ans }
+    elsif idx[0]
+      # idx[0]より後ろにlog[1]を挿入
+    elsif idx[1]
+      # idx[1]より前にlog[0]を挿入
+    elsif idx[1] < idx[0]
+      # 両方存在するけど順番通りでない場合は片方をそのままにするパターンを2通り考える
+    end
+  end
+  p "new_answers=#{new_answers}"
+  answers = new_answers
+  break if i == 3
 end
-p answer
+p answers
