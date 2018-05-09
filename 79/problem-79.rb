@@ -25,43 +25,25 @@ File.open("keylog.txt") do |f|
 end
 
 def add_digits(material, digits)
+  return if digits.length > 2
   ret = []
-  [*0..material.length].combination(2).to_a.each do |c|
+  [*0..material.length].combination(digits.length).to_a.each do |combi|
     arr = material.dup
-    arr.insert(c[0], digits[0])
-    arr.insert(c[1]+1, digits[1])
+    combi.each_with_index do |c, i|
+      arr.insert(c, digits[i])
+    end
     ret.push(arr)
   end
   ret
 end
 
-p add_digits([0, 1, 2], [3, 4])
+answer = []
 
-# answer = []
-=begin
-keylog.each_with_index do |log, i|
-  idx = log.map{ |n| answer.index(n) }
-  if idx.map(&:nil?).inject(:&)
-    answer.push(log).flatten!
-  elsif idx.include?(nil)
-    new_val = log[idx.index(nil)]
-    if 1-idx.index(nil) == 0
-      answer.push(new_val)
-    else
-      answer.unshift(new_val)
-    end
-  else
-    if idx[0] < idx[1]
-      # do nothing
-    else
-      if answer.slice(idx[0], answer.length-idx[0]).index(log[1]).nil?
-        answer.push(log[1])
-      end
-    end
-  end
-  p "log=#{log}, i=#{i}, answer=#{answer.inject(:+)}"
-  # break if i == 25
+keylog.each do |log|
+  answer.push(log) if answer.length == 0
+  # 両方存在しない場合はdigitsに2つとも放り込む
+  # 片方だけ存在するは数字より前or後ろだけmaterialにしてdigitsに1つ放り込む
+  # 両方順番通りに存在する場合はそのまま
+  # 両方存在するけど順番通りでない場合は片方をそのままにするパターンを2通り考える
 end
-p answer.inject(:+)
-=end
-
+p answer
