@@ -45,23 +45,27 @@ keylog.each_with_index do |log, i|
     answers.push(log)
     next
   end
-  p "answers=#{answers}"
   new_answers = []
   answers.each do |ans|
     idx = log.map{ |l| ans.index(l) }
-    p "idx=#{idx}"
     if idx.all?{ |i| i.nil? }
       add_digits(ans, log).each{ |new_ans| new_answers << new_ans }
     elsif idx[0]
-      # idx[0]より後ろにlog[1]を挿入
+      head = ans[0..idx[0]]
+      new_tails = add_digits(ans[idx[0]+1..ans.length-1], [log[1]])
+      new_tails.each{ |new_tail| new_answers << head+new_tail }
     elsif idx[1]
-      # idx[1]より前にlog[0]を挿入
-    elsif idx[1] < idx[0]
+      tail = ans[idx[1]..ans.length-1]
+      new_heads = add_digits(ans[0..idx[1]-1], [log[0]])
+      new_heads.each{ |new_head| new_answers << new_head+tail }
+    # elsif idx[1] < idx[0]
       # 両方存在するけど順番通りでない場合は片方をそのままにするパターンを2通り考える
+    else
+      new_answers << ans
     end
   end
   p "new_answers=#{new_answers}"
   answers = new_answers
-  break if i == 3
+  break if i == 10
 end
 p answers
