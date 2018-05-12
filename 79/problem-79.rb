@@ -37,15 +37,21 @@ def add_digits(material, digits)
   ret
 end
 
-answers = []
+answers = [keylog[0]]
 
 keylog.each_with_index do |log, i|
-  p "log=#{log}"
-  if answers.length == 0
-    answers.push(log)
+  next if i == 0
+  
+  suitable_answers = answers.select do |ans|
+    idx = log.map{ |l| ans.index(l) }
+    !idx.any?(&:nil?) && idx[0] < idx[1]
+  end
+  if suitable_answers.any?
+    answers = suitable_answers
     next
   end
-  new_answers = []
+
+  new_answers = []  
   answers.each do |ans|
     idx = log.map{ |l| ans.index(l) }
     if idx.all?{ |i| i.nil? }
@@ -58,14 +64,8 @@ keylog.each_with_index do |log, i|
       tail = ans[idx[1]..ans.length-1]
       new_heads = add_digits(ans[0..idx[1]-1], [log[0]])
       new_heads.each{ |new_head| new_answers << new_head+tail }
-    # elsif idx[1] < idx[0]
-      # 両方存在するけど順番通りでない場合は片方をそのままにするパターンを2通り考える
-    else
-      new_answers << ans
     end
   end
-  p "new_answers=#{new_answers}"
-  answers = new_answers
-  break if i == 10
+  answers = new_answers.select{ |ans| ans.length == new_answers.map(&:length).min }
 end
-p answers
+p answers.map{ |ans| ans.inject(:+) }.uniq
