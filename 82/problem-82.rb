@@ -26,6 +26,7 @@
 =end
 
 matrix = []
+=begin
 matrix = [
   [131, 673, 234, 103, 18],
   [201, 96, 342, 965, 150],
@@ -33,53 +34,61 @@ matrix = [
   [537, 699, 497, 121, 956],
   [805, 732, 524, 37, 331]
 ]
-=begin
+=end
+
 File.open("matrix.txt") do |f|
   f.each_line{ |line| matrix << line.split(',').map(&:to_i) }
 end
-=end
 
 # 処理の高速化のため、転置する
 matrix = matrix.transpose
 
-# matrix.length.times do |start|
-start = 1
+answers = []
 
-# pathはstartからの最短距離を表す
-path = Marshal.load(Marshal.dump(matrix))
-p path
-p ''
+matrix.length.times do |start|
+  # start = 1
 
-path.each_with_index do |row, i|
-  if i == 0
-    # 1行目はstartから上下移動した距離を格納
-    path[i] = row.map.with_index do |elm, j|
-      elm = (j < start ? row[j..start].sum : row[start..j].sum)
-    end
-  else
-    # 2行目以降
-    # まず、左から移動してきた距離を返す
-    path[i] = row.map.with_index do |elm, j|
-      elm += path[i-1][j]
-    end
-    # 左から移動してきた距離よりも、上や下から来たほうが速い場合は修正する
-    # 理論上はすべて調べなくてはならないが、そんなことはほぼないので深さは3を指定
-    # TODO
-    path[i].each.with_index do |elm, j|
-      if j != 0 && elm > path[i][j-1] + row[i][j]
-        path[i][j] = path[i][j-1] + row[i][j]
-        p "#{elm} -> #{path[i][j]}"
+  # pathはstartからの最短距離を表す
+  path = Marshal.load(Marshal.dump(matrix))
+  # p path
+  # p ''
+
+  path.each_with_index do |row, i|
+    if i == 0
+      # 1行目はstartから上下移動した距離を格納
+      path[i] = row.map.with_index do |elm, j|
+        elm = (j < start ? row[j..start].sum : row[start..j].sum)
       end
-    end
-    path[i].reverse_each.with_index do |elm, j|
-      index = path[i].length-1-j
-      if index != 0 && elm > path[i][index] + row[i][index]
-        path[i][index] = path[i][index-1] + row[i][index]
-        p "#{elm} -> #{path[i][index]}"
+    else
+      # 2行目以降
+      # まず、左から移動してきた距離を返す
+      path[i] = row.map.with_index do |elm, j|
+        elm += path[i-1][j]
       end
+      
+      # 左から移動してきた距離よりも、上や下から来たほうが速い場合は修正する
+      # 理論上はすべて調べなくてはならない
+      (path[i].length-1-start).times do
+        buf = path[i].dup
+        path[i].each.with_index do |elm, j|
+          if j != 0 && elm > buf[j-1] + row[j]
+            path[i][j] = buf[j-1] + row[j]
+            # p "#{elm} -> #{path[i][j]}"
+          end
+        end
+        path[i].each.with_index do |elm, j|
+          if j != path[i].length-1 && elm > buf[j+1] + row[j]
+            path[i][j] = buf[j+1] + row[j]
+            # p "#{elm} -> #{path[i][j]}"
+          end
+        end
+      end
+      
     end
+    # p path
   end
-  p path
+  answers <<  path[path.length-1].min
+  # p answers.length
 end
-
-#end
+p answers
+p answers.min
