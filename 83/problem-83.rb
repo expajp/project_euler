@@ -32,3 +32,11 @@ File.open("matrix.txt") do |f|
 end
 =end
 
+q = [*0..matrix.length-1].repeated_permutation(2).to_a
+prev = []
+matrix.length.times { |i| prev[i] = [] }
+p q
+p prev
+
+while q.flatten.length > 0 do
+end
