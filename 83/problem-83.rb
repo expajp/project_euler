@@ -32,11 +32,12 @@ File.open("matrix.txt") do |f|
 end
 =end
 
+d = Marshal.load(Marshal.dump(matrix)).map{ |row| row.map{ |j| j = 999999 } }
+d[0][0] = 0
+
 q = [*0..matrix.length-1].repeated_permutation(2).to_a
 prev = []
 matrix.length.times { |i| prev[i] = [] }
-p q
-p prev
 
 while q.flatten.length > 0 do
 end
