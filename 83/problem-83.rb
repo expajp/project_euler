@@ -33,11 +33,15 @@ end
 =end
 
 d = Marshal.load(Marshal.dump(matrix)).map{ |row| row.map{ |j| j = 999999 } }
-d[0][0] = 0
+d[0][0] = matrix[0][0]
 
 q = [*0..matrix.length-1].repeated_permutation(2).to_a
 prev = []
 matrix.length.times { |i| prev[i] = [] }
 
 while q.flatten.length > 0 do
+  # 最小である頂点uの座標をqから取り出す
+  # uから移動可能な各点vについてeach
+  # いまdに格納されている距離の情報が、d(u)+matrix(u->v)より大きければ入れ替え
+  # prev(u)にvの座標を格納
 end
