@@ -15,10 +15,16 @@
 ---
 上下左右に変が伸びているとして、ダイクストラ法を実装する
 =end
+@big_num = 999999
 
-def search_point(length, arr)
-  u_idx_i = arr.map(&:min).index(length)
-  u_idx_j = arr[u_idx_i].index(length)
+def search_point_in_q(arr, q)
+  for_search = Marshal.load(Marshal.dump(arr)).map{ |row| row.map{ |j| j = @big_num } }
+  q.each do |p|
+    for_search[p[0]][p[1]] = arr[p[0]][p[1]]
+  end
+  u_length = for_search.map(&:min).min
+  u_idx_i = for_search.map(&:min).index(u_length)
+  u_idx_j = for_search[u_idx_i].index(u_length)
   [u_idx_i, u_idx_j]
 end
 
@@ -33,6 +39,7 @@ end
 
 matrix = []
 
+=begin
 matrix = [
   [131, 673, 234, 103, 18],
   [201, 96, 342, 965, 150],
@@ -40,24 +47,20 @@ matrix = [
   [537, 699, 497, 121, 956],
   [805, 732, 524, 37, 331]
 ]
+=end
 
-=begin
 File.open("matrix.txt") do |f|
   f.each_line{ |line| matrix << line.split(',').map(&:to_i) }
 end
-=end
 
-d = Marshal.load(Marshal.dump(matrix)).map{ |row| row.map{ |j| j = 999999 } }
+d = Marshal.load(Marshal.dump(matrix)).map{ |row| row.map{ |j| j = @big_num } }
 d[0][0] = matrix[0][0]
 
 q = [*0..matrix.length-1].repeated_permutation(2).to_a
-prev = []
-matrix.length.times { |i| prev[i] = [] }
 
 while q.flatten.length > 0 do
   # 最小である頂点uの座標をqから取り出す
-  u_length = d.map(&:min).min
-  u = search_point(u_length, d)
+  u = search_point_in_q(d, q)
   q.delete(u)
 
   # uから移動可能な各点vを格納
@@ -65,7 +68,8 @@ while q.flatten.length > 0 do
   
   # 各点vについてeach
   vs.each do |v|
-    # いまdに格納されている距離の情報が、d(u)+matrix(u->v)より大きければ入れ替え
-    # prev(u)にvの座標を格納
+    new_distance = d[u[0]][u[1]] + matrix[v[0]][v[1]]
+    d[v[0]][v[1]] = (new_distance < d[v[0]][v[1]] ? new_distance : d[v[0]][v[1]])
   end
 end
+p d[d.length-1][d[0].length-1]
