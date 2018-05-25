@@ -16,6 +16,21 @@
 上下左右に変が伸びているとして、ダイクストラ法を実装する
 =end
 
+def search_point(length, arr)
+  u_idx_i = arr.map(&:min).index(length)
+  u_idx_j = arr[u_idx_i].index(length)
+  [u_idx_i, u_idx_j]
+end
+
+def movable_points(u, d)
+  vs = []
+  vs << [u[0]-1, u[1]] if u[0] != 0 # 左
+  vs << [u[0]+1, u[1]] if u[0] != d[0].length-1 # 右
+  vs << [u[0], u[1]-1] if u[1] != 0 # 上
+  vs << [u[0], u[1]+1] if u[1] != d.length-1 # 下
+  vs
+end
+
 matrix = []
 
 matrix = [
@@ -41,7 +56,16 @@ matrix.length.times { |i| prev[i] = [] }
 
 while q.flatten.length > 0 do
   # 最小である頂点uの座標をqから取り出す
-  # uから移動可能な各点vについてeach
-  # いまdに格納されている距離の情報が、d(u)+matrix(u->v)より大きければ入れ替え
-  # prev(u)にvの座標を格納
+  u_length = d.map(&:min).min
+  u = search_point(u_length, d)
+  q.delete(u)
+
+  # uから移動可能な各点vを格納
+  vs = movable_points(u, d)
+  
+  # 各点vについてeach
+  vs.each do |v|
+    # いまdに格納されている距離の情報が、d(u)+matrix(u->v)より大きければ入れ替え
+    # prev(u)にvの座標を格納
+  end
 end
