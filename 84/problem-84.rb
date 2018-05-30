@@ -45,25 +45,85 @@ GOマスを00とし番号を00-39と順番に振る. これにより各マスを
 ゾロ目ならば、もう一度サイコロを振る
 
 上位を調べれば良いので、探索の深さを決める
+
+diceroll_tableを順に調べる
+出たマスに進み、そこの指示に従う
+止まったら、そこに数を記す
+単位は(16*36)^3分の1
+ゾロ目ならば、もう一度diceroll_tableを調べる
+これを3回繰り返す
 =end
 
+dice = 6
+
 # サイコロの出目
+# すべての確率は等しいので、これを舐めれば全条件の検証になる
 # 問題に回答するとき、ここの6を4にする
 diceroll_table = []
-1.upto(6) do |i|
+1.upto(dice) do |i|
   diceroll_table[i] = []
-  1.upto(6) do |j|
+  1.upto(dice) do |j|
     diceroll_table[i][j] = i+j
   end
 end
 
 # 盤面
-board = [
+@board = [
   "GO", "A1", "CC1", "A2", "T1", "R1", "B1", "CH1", "B2", "B3",
   "JAIL", "C1", "U1", "C2", "C3", "R2", "D1", "CC2", "D2", "D3",
   "FP", "E1", "CH2", "E2", "E3", "R3", "F1", "F2", "U2", "F3",
   "G2J", "G1", "G2", "CC3", "G3", "R4", "CH3", "H1", "T2", "H2"
 ] # 各マスの名称はunique
 
-p = board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
 
+
+p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
+
+# ゾロ目のルールなしで検証する
+# 単位は16*16*36分の1
+diceroll_table.each_with_index do |second, i|
+  next if second.nil?
+  second.each_with_index do |num, j|
+    next if num.nil?
+    point = num
+    command = @board[point][0..1]
+    p command
+    
+    case command
+    when "G2" then
+      p[@board.index("JAIL")] += 16*16
+    when "CC" then
+      p[point] += 16*14
+      p[@board.index("GO")] += 16
+      p[@board.index("JAIL")] += 16
+    when "CH" then
+      p[point] += 16*6
+      p[@board.index("GO")] += 16
+      p[@board.index("JAIL")] += 16
+      p[@board.index("C1")] += 16
+      p[@board.index("E3")] += 16
+      p[@board.index("H2")] += 16
+      p[@board.index("R1")] += 16
+    # p[next_r(point)] += 16*2
+    # p[point-3] += 16
+    else
+      p[point] += 16*16
+    end
+      
+  end
+end
+
+=begin
+GOへ進め
+JAILへ進め
+C1へ進め
+E3へ進め
+H2へ進め
+R1へ進め
+次のRへ進め (Rはrailway company, 鉄道会社の意)
+次のRへ進め
+次のUへ進め (Uはutility company, 公共事業会社の意)
+3マス戻れ
+=end
+
+p p
