@@ -75,7 +75,10 @@ end
   "G2J", "G1", "G2", "CC3", "G3", "R4", "CH3", "H1", "T2", "H2"
 ] # 各マスの名称はunique
 
-
+def next_r(point)
+  r_map = @board.select{ |sq| sq[0] == "R" }.map{ |sq| @board.index(sq) }.sort
+  r_map.find{ |r| point < r }
+end  
 
 p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
 
@@ -87,7 +90,6 @@ diceroll_table.each_with_index do |second, i|
     next if num.nil?
     point = num
     command = @board[point][0..1]
-    p command
     
     case command
     when "G2" then
@@ -104,8 +106,8 @@ diceroll_table.each_with_index do |second, i|
       p[@board.index("E3")] += 16
       p[@board.index("H2")] += 16
       p[@board.index("R1")] += 16
-    # p[next_r(point)] += 16*2
-    # p[point-3] += 16
+      p[next_r(point)] += 16*2
+      p[point-3] += 16
     else
       p[point] += 16*16
     end
@@ -113,17 +115,5 @@ diceroll_table.each_with_index do |second, i|
   end
 end
 
-=begin
-GOへ進め
-JAILへ進め
-C1へ進め
-E3へ進め
-H2へ進め
-R1へ進め
-次のRへ進め (Rはrailway company, 鉄道会社の意)
-次のRへ進め
-次のUへ進め (Uはutility company, 公共事業会社の意)
-3マス戻れ
-=end
 
 p p
