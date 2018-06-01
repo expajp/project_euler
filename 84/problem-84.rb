@@ -80,6 +80,10 @@ def next_r(point)
   r_map.find{ |r| point < r }
 end  
 
+def execute_instruction(point, unit)
+  # 盤上の命令を実行
+end
+
 p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
 
 # ゾロ目のルールなしで検証する
@@ -107,7 +111,8 @@ diceroll_table.each_with_index do |second, i|
       p[@board.index("H2")] += 16
       p[@board.index("R1")] += 16
       p[next_r(point)] += 16*2
-      p[point-3] += 16
+      execute_instruction(point-3, 1)
+      # p[point-3] += 16
     else
       p[point] += 16*16
     end
