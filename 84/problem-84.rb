@@ -46,11 +46,11 @@ GOマスを00とし番号を00-39と順番に振る. これにより各マスを
 
 上位を調べれば良いので、探索の深さを決める
 
-diceroll_tableを順に調べる
+@diceroll_tableを順に調べる
 出たマスに進み、そこの指示に従う
 止まったら、そこに数を記す
 単位は(16*36)^3分の1
-ゾロ目ならば、もう一度diceroll_tableを調べる
+ゾロ目ならば、もう一度@diceroll_tableを調べる
 これを3回繰り返す
 =end
 
@@ -59,11 +59,11 @@ dice = 6
 # サイコロの出目
 # すべての確率は等しいので、これを舐めれば全条件の検証になる
 # 問題に回答するとき、ここの6を4にする
-diceroll_table = []
+@diceroll_table = []
 1.upto(dice) do |i|
-  diceroll_table[i] = []
+  @diceroll_table[i] = []
   1.upto(dice) do |j|
-    diceroll_table[i][j] = i+j
+    @diceroll_table[i][j] = i+j
   end
 end
 
@@ -81,44 +81,37 @@ def next_r(point)
 end  
 
 def execute_instruction(point, unit)
-  # 盤上の命令を実行
-end
-
-p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-
-# ゾロ目のルールなしで検証する
-# 単位は16*16*36分の1
-diceroll_table.each_with_index do |second, i|
-  next if second.nil?
-  second.each_with_index do |num, j|
-    next if num.nil?
-    point = num
-    command = @board[point][0..1]
-    
-    case command
-    when "G2" then
-      p[@board.index("JAIL")] += 16*16
-    when "CC" then
-      p[point] += 16*14
-      p[@board.index("GO")] += 16
-      p[@board.index("JAIL")] += 16
-    when "CH" then
-      p[point] += 16*6
-      p[@board.index("GO")] += 16
-      p[@board.index("JAIL")] += 16
-      p[@board.index("C1")] += 16
-      p[@board.index("E3")] += 16
-      p[@board.index("H2")] += 16
-      p[@board.index("R1")] += 16
-      p[next_r(point)] += 16*2
-      execute_instruction(point-3, 1)
-      # p[point-3] += 16
-    else
-      p[point] += 16*16
-    end
+  @diceroll_table.each_with_index do |second, i|
+    next if second.nil?
+    second.each_with_index do |num, j|
+      next if num.nil?
+      point = num
+      command = @board[point][0..1]
       
+      case command
+      when "G2" then
+        @p[@board.index("JAIL")] += unit*unit
+      when "CC" then
+        @p[point] += unit*14
+        @p[@board.index("GO")] += unit
+        @p[@board.index("JAIL")] += unit
+      when "CH" then
+        @p[point] += unit*6
+        @p[@board.index("GO")] += unit
+        @p[@board.index("JAIL")] += unit
+        @p[@board.index("C1")] += unit
+        @p[@board.index("E3")] += unit
+        @p[@board.index("H2")] += unit
+        @p[@board.index("R1")] += unit
+        @p[next_r(point)] += unit*2
+        # execute_instruction((point-3<0 ? point+40-3 : point-3), 1)
+      else
+        @p[point] += unit*unit
+      end      
+    end
   end
 end
-
-
-p p
+ 
+@p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
+execute_instruction(0, 16)
+p @p
