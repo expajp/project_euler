@@ -54,7 +54,7 @@ GOマスを00とし番号を00-39と順番に振る. これにより各マスを
 これを3回繰り返す
 =end
 
-dice = 6
+dice = 4
 
 # サイコロの出目
 # すべての確率は等しいので、これを舐めれば全条件の検証になる
@@ -104,7 +104,11 @@ def execute_instruction(point, unit)
         @p[@board.index("H2")] += unit
         @p[@board.index("R1")] += unit
         @p[next_r(point)] += unit*2
-        # execute_instruction((point-3<0 ? point+40-3 : point-3), 1)
+        if @board[point-3][0..1] != "G2" || @board[point-3][0..1] != "CC" || @board[point-3][0..1] != "CH"
+          @p[point-3] += unit
+        else
+          execute_instruction(point-3, unit/16)
+        end
       else
         @p[point] += unit*unit
       end      
@@ -113,5 +117,5 @@ def execute_instruction(point, unit)
 end
  
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-execute_instruction(0, 16)
+3.times{ execute_instruction(0, 16**6) }
 p @p
