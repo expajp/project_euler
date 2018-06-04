@@ -85,6 +85,15 @@ def execute_instruction(point, unit)
     next if second.nil?
     second.each_with_index do |num, j|
       next if num.nil?
+      if i == j
+        # pointだけ更新
+        # もう一度サイコロを振る  
+      else
+        # @pを更新
+        # 次の出目を調べる
+      end
+      
+=begin
       point = num
       command = @board[point][0..1]
       
@@ -111,11 +120,12 @@ def execute_instruction(point, unit)
         end
       else
         @p[point] += unit*unit
-      end      
+      end
+=end
     end
   end
 end
  
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-3.times{ execute_instruction(0, 16**6) }
+execute_instruction(point, 16**6)
 p @p
