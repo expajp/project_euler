@@ -73,7 +73,7 @@ unitの初期値は、ある出目に対して
 1回目の試行でCH3に止まることはないが、これの3乗を初期値にすればわかりやすい
 =end
 
-dice = 4
+dice = 6
 
 # サイコロの出目
 # すべての確率は等しいので、これを舐めれば全条件の検証になる
@@ -99,52 +99,89 @@ def next_r(point)
   r_map.find{ |r| point < r }
 end  
 
-def execute_instruction(point, unit)
-  @diceroll_table.each_with_index do |second, i|
-    next if second.nil?
-    second.each_with_index do |num, j|
+def jumping_square?(point)
+  ['CC', 'CH', 'G2'].include?(@board[point][0..1])
+end
+
+def ch3?(point)
+  @board[point] == 'CH3'
+end
+
+
+def add_p(point, unit)
+  if ch3?(point) # CH3
+    @p[point-3] += unit*14/16
+    @p[@board.index("GO")] += unit/16
+    @p[@board.index("JAIL")] += unit/16
+  elsif jumping_square?(point) # G2J, CH, CCのいずれか
+    case @board[point][0..1]
+    when "G2" then
+      @p[@board.index("JAIL")] += unit*16
+    when "CC" then
+      @p[point] += unit*14
+      @p[@board.index("GO")] += unit
+      @p[@board.index("JAIL")] += unit
+    when "CH" then
+      @p[point] += unit*6
+      @p[@board.index("GO")] += unit
+      @p[@board.index("JAIL")] += unit
+      @p[@board.index("C1")] += unit
+      @p[@board.index("E3")] += unit
+      @p[@board.index("H2")] += unit
+      @p[@board.index("R1")] += unit
+      @p[next_r(point)] += unit*2
+      @p[point-3] += unit
+    end
+  else
+    @p[point] += unit*16
+  end
+end
+
+def execute_instruction(point, unit, times)
+  @diceroll_table.each_with_index do |row, i|
+    next if row.nil?
+    row.each_with_index do |num, j|
       next if num.nil?
-      if i == j
-        # pointだけ更新
-        # もう一度サイコロを振る  
-      else
-        # @pを更新
-        # 次の出目を調べる
-      end
-      
-=begin
-      point = num
-      command = @board[point][0..1]
-      
-      case command
-      when "G2" then
-        @p[@board.index("JAIL")] += unit*unit
-      when "CC" then
-        @p[point] += unit*14
-        @p[@board.index("GO")] += unit
-        @p[@board.index("JAIL")] += unit
-      when "CH" then
-        @p[point] += unit*6
-        @p[@board.index("GO")] += unit
-        @p[@board.index("JAIL")] += unit
-        @p[@board.index("C1")] += unit
-        @p[@board.index("E3")] += unit
-        @p[@board.index("H2")] += unit
-        @p[@board.index("R1")] += unit
-        @p[next_r(point)] += unit*2
-        if @board[point-3][0..1] != "G2" || @board[point-3][0..1] != "CC" || @board[point-3][0..1] != "CH"
-          @p[point-3] += unit
+      point = (point+num)%40
+      if i == j # ゾロ目
+        if times >= 3
+          @p[@board.index('JAIL')] += unit
+          next
+        elsif ch3?(point)
+          execute_instruction(point, unit*14/16, times+1)
+          execute_instruction(@board.index("GO"), unit/16, times+1)
+          execute_instruction(@board.index("JAIL"), unit/16, times+1)
+        elsif jumping_square?(point)
+          case @board[point][0..1]
+          when "G2" then
+            execute_instruction(@board.index("JAIL"), unit, times+1)
+          when "CC" then
+            execute_instruction(point, unit*14, times+1)
+            execute_instruction(@board.index("GO"), unit, times+1)
+            execute_instruction(@board.index("JAIL"), unit, times+1)
+          when "CH" then
+            execute_instruction(point, unit*6, times+1)
+            execute_instruction(@board.index("GO"), unit, times+1)
+            execute_instruction(@board.index("JAIL"), unit, times+1)
+            execute_instruction(@board.index("C1"), unit, times+1)
+            execute_instruction(@board.index("E3"), unit, times+1)
+            execute_instruction(@board.index("H2"), unit, times+1)
+            execute_instruction(@board.index("R1"), unit, times+1)
+            execute_instruction(next_r(point), unit, times+1)
+            execute_instruction(point-3, unit, times+1)
+          end
         else
-          execute_instruction(point-3, unit/16)
+          execute_instruction(point, unit, times+1)
         end
       else
-        @p[point] += unit*unit
+        add_p(point, unit)
+        next
       end
-=end
     end
   end
 end
- 
+
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-execute_instruction(point, 16**6)
+execute_instruction(0, 16**6, 1)
+@p.map!.with_index{ |p, i| { p: p, i: i } }.sort_by!{ |h| -h[:p] }.map!{ |h| h[:i] }
 p @p
