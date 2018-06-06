@@ -96,11 +96,11 @@ end
 
 def next_r(point)
   r_map = @board.select{ |sq| sq[0] == "R" }.map{ |sq| @board.index(sq) }.sort
-  r_map.find{ |r| point < r }
+  r_map.find{ |r| point < r } || 5
 end  
 
 def jumping_square?(point)
-  ['CC', 'CH', 'G2'].include?(@board[point][0..1])
+  ['CC', 'CH', 'G2'].include?(@board[point][0..1]) && @board[point] != 'G2'
 end
 
 def ch3?(point)
@@ -110,7 +110,16 @@ end
 
 def add_p(point, unit)
   if ch3?(point) # CH3
-    @p[point-3] += unit*14/16
+    @p[point] += unit*6
+    @p[@board.index("GO")] += unit
+    @p[@board.index("JAIL")] += unit
+    @p[@board.index("C1")] += unit
+    @p[@board.index("E3")] += unit
+    @p[@board.index("H2")] += unit
+    @p[@board.index("R1")] += unit
+    @p[next_r(point)] += unit*2
+
+    @p[point] += unit*14/16
     @p[@board.index("GO")] += unit/16
     @p[@board.index("JAIL")] += unit/16
   elsif jumping_square?(point) # G2J, CH, CCのいずれか
@@ -130,7 +139,7 @@ def add_p(point, unit)
       @p[@board.index("H2")] += unit
       @p[@board.index("R1")] += unit
       @p[next_r(point)] += unit*2
-      @p[point-3] += unit
+      @p[(point-3+40)%40] += unit
     end
   else
     @p[point] += unit*16
@@ -145,36 +154,45 @@ def execute_instruction(point, unit, times)
       point = (point+num)%40
       if i == j # ゾロ目
         if times >= 3
-          @p[@board.index('JAIL')] += unit
+          @p[@board.index('JAIL')] += unit/36
           next
         elsif ch3?(point)
-          execute_instruction(point, unit*14/16, times+1)
-          execute_instruction(@board.index("GO"), unit/16, times+1)
-          execute_instruction(@board.index("JAIL"), unit/16, times+1)
+          execute_instruction(point, unit*6/(16*36), times+1)
+          execute_instruction(@board.index("GO"), unit/(16*36), times+1)
+          execute_instruction(@board.index("JAIL"), unit/(16*36), times+1)
+          execute_instruction(@board.index("C1"), unit/(16*36), times+1)
+          execute_instruction(@board.index("E3"), unit/(16*36), times+1)
+          execute_instruction(@board.index("H2"), unit/(16*36), times+1)
+          execute_instruction(@board.index("R1"), unit/(16*36), times+1)
+          execute_instruction(next_r(point), unit/(16*36), times+1)
+          
+          execute_instruction(point, unit*14/(16*16*36), times+1)
+          execute_instruction(@board.index("GO"), unit/(16*16*36), times+1)
+          execute_instruction(@board.index("JAIL"), unit/(16*16*36), times+1)
         elsif jumping_square?(point)
           case @board[point][0..1]
           when "G2" then
-            execute_instruction(@board.index("JAIL"), unit, times+1)
+            execute_instruction(@board.index("JAIL"), unit/36, times+1)
           when "CC" then
-            execute_instruction(point, unit*14, times+1)
-            execute_instruction(@board.index("GO"), unit, times+1)
-            execute_instruction(@board.index("JAIL"), unit, times+1)
+            execute_instruction(point, unit*14/(36*16), times+1)
+            execute_instruction(@board.index("GO"), unit/(36*16), times+1)
+            execute_instruction(@board.index("JAIL"), unit/(36*16), times+1)
           when "CH" then
-            execute_instruction(point, unit*6, times+1)
-            execute_instruction(@board.index("GO"), unit, times+1)
-            execute_instruction(@board.index("JAIL"), unit, times+1)
-            execute_instruction(@board.index("C1"), unit, times+1)
-            execute_instruction(@board.index("E3"), unit, times+1)
-            execute_instruction(@board.index("H2"), unit, times+1)
-            execute_instruction(@board.index("R1"), unit, times+1)
-            execute_instruction(next_r(point), unit, times+1)
-            execute_instruction(point-3, unit, times+1)
+            execute_instruction(point, unit*6/(36*16), times+1)
+            execute_instruction(@board.index("GO"), unit/(36*16), times+1)
+            execute_instruction(@board.index("JAIL"), unit/(36*16), times+1)
+            execute_instruction(@board.index("C1"), unit/(36*16), times+1)
+            execute_instruction(@board.index("E3"), unit/(36*16), times+1)
+            execute_instruction(@board.index("H2"), unit/(36*16), times+1)
+            execute_instruction(@board.index("R1"), unit/(36*16), times+1)
+            execute_instruction(next_r(point), unit/(36*16), times+1)
+            execute_instruction((point-3+40)%40, unit/(36*16), times+1)
           end
         else
-          execute_instruction(point, unit, times+1)
+          execute_instruction(point, unit/36, times+1)
         end
       else
-        add_p(point, unit)
+        add_p(point, unit/36)
         next
       end
     end
@@ -182,6 +200,6 @@ def execute_instruction(point, unit, times)
 end
 
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-execute_instruction(0, 16**6, 1)
-@p.map!.with_index{ |p, i| { p: p, i: i } }.sort_by!{ |h| -h[:p] }.map!{ |h| h[:i] }
+execute_instruction(0, (16**6)*(36**3), 1)
+@p.map!.with_index{ |p, i| { p: p, i: i } }.sort_by!{ |h| -h[:p] } # .map!{ |h| h[:i] }
 p @p
