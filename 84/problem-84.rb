@@ -71,6 +71,10 @@ unitの初期値は、ある出目に対して
   CH3で3マス戻れを引く確率が1/16, CCで移動カードを引く確率が1/16
 なので、256とする
 1回目の試行でCH3に止まることはないが、これの3乗を初期値にすればわかりやすい
+
+unitは1/36を表す値
+ゾロ目になった場合、次のunitはさらに1/36なのでこれを考慮して呼び出す
+ゾロ目かつカードコマに止まった場合、次のunitは(1/36)*(1/16)
 =end
 
 dice = 6
@@ -107,99 +111,100 @@ def ch3?(point)
   @board[point] == 'CH3'
 end
 
-
+# unitは1/36を表す
 def add_p(point, unit)
   if ch3?(point) # CH3
-    @p[point] += unit*6
-    @p[@board.index("GO")] += unit
-    @p[@board.index("JAIL")] += unit
-    @p[@board.index("C1")] += unit
-    @p[@board.index("E3")] += unit
-    @p[@board.index("H2")] += unit
-    @p[@board.index("R1")] += unit
-    @p[next_r(point)] += unit*2
+    @p[point] += (unit/16)*6
+    @p[@board.index("GO")] += (unit/16)
+    @p[@board.index("JAIL")] += (unit/16)
+    @p[@board.index("C1")] += (unit/16)
+    @p[@board.index("E3")] += (unit/16)
+    @p[@board.index("H2")] += (unit/16)
+    @p[@board.index("R1")] += (unit/16)
+    @p[next_r(point)] += (unit/16)*2
 
-    @p[point] += unit*14/16
-    @p[@board.index("GO")] += unit/16
-    @p[@board.index("JAIL")] += unit/16
+    @p[point] += (unit/(16*16))*14
+    @p[@board.index("GO")] += (unit/(16*16))
+    @p[@board.index("JAIL")] += (unit/(16*16))
   elsif jumping_square?(point) # G2J, CH, CCのいずれか
     case @board[point][0..1]
     when "G2" then
-      @p[@board.index("JAIL")] += unit*16
+      @p[@board.index("JAIL")] += unit
     when "CC" then
-      @p[point] += unit*14
-      @p[@board.index("GO")] += unit
-      @p[@board.index("JAIL")] += unit
+      @p[point] += (unit/16)*14
+      @p[@board.index("GO")] += (unit/16)
+      @p[@board.index("JAIL")] += (unit/16)
     when "CH" then
-      @p[point] += unit*6
-      @p[@board.index("GO")] += unit
-      @p[@board.index("JAIL")] += unit
-      @p[@board.index("C1")] += unit
-      @p[@board.index("E3")] += unit
-      @p[@board.index("H2")] += unit
-      @p[@board.index("R1")] += unit
-      @p[next_r(point)] += unit*2
-      @p[(point-3+40)%40] += unit
+      @p[point] += (unit/16)*6
+      @p[@board.index("GO")] += (unit/16)
+      @p[@board.index("JAIL")] += (unit/16)
+      @p[@board.index("C1")] += (unit/16)
+      @p[@board.index("E3")] += (unit/16)
+      @p[@board.index("H2")] += (unit/16)
+      @p[@board.index("R1")] += (unit/16)
+      @p[next_r(point)] += (unit/16)*2
+      @p[(point-3+40)%40] += (unit/16)
     end
   else
-    @p[point] += unit*16
+    @p[point] += unit
   end
 end
 
 def execute_instruction(point, unit, times)
+  p "execute_instruction(#{point}, #{unit}, #{times})"
   @diceroll_table.each_with_index do |row, i|
     next if row.nil?
     row.each_with_index do |num, j|
       next if num.nil?
       point = (point+num)%40
       if i == j # ゾロ目
+        new_unit = { normal: unit/36, card: unit/(36*16), ch3: unit/(36*16*16) }
         if times >= 3
-          @p[@board.index('JAIL')] += unit/36
+          @p[@board.index('JAIL')] += unit
           next
         elsif ch3?(point)
-          execute_instruction(point, unit*6/(16*36), times+1)
-          execute_instruction(@board.index("GO"), unit/(16*36), times+1)
-          execute_instruction(@board.index("JAIL"), unit/(16*36), times+1)
-          execute_instruction(@board.index("C1"), unit/(16*36), times+1)
-          execute_instruction(@board.index("E3"), unit/(16*36), times+1)
-          execute_instruction(@board.index("H2"), unit/(16*36), times+1)
-          execute_instruction(@board.index("R1"), unit/(16*36), times+1)
-          execute_instruction(next_r(point), unit/(16*36), times+1)
-          
-          execute_instruction(point, unit*14/(16*16*36), times+1)
-          execute_instruction(@board.index("GO"), unit/(16*16*36), times+1)
-          execute_instruction(@board.index("JAIL"), unit/(16*16*36), times+1)
+          execute_instruction(point, new_unit[:card]*6, times+1)
+          execute_instruction(@board.index("GO"), new_unit[:card], times+1)
+          execute_instruction(@board.index("JAIL"), new_unit[:card], times+1)
+          execute_instruction(@board.index("C1"), new_unit[:card], times+1)
+          execute_instruction(@board.index("E3"), new_unit[:card], times+1)
+          execute_instruction(@board.index("H2"), new_unit[:card], times+1)
+          execute_instruction(@board.index("R1"), new_unit[:card], times+1)
+          execute_instruction(next_r(point), new_unit[:card], times+1)
+
+          execute_instruction(point, new_unit[:ch3]*14, times+1)
+          execute_instruction(@board.index("GO"), new_unit[:ch3], times+1)
+          execute_instruction(@board.index("JAIL"), new_unit[:ch3], times+1)
         elsif jumping_square?(point)
           case @board[point][0..1]
           when "G2" then
-            execute_instruction(@board.index("JAIL"), unit/36, times+1)
+            execute_instruction(@board.index("JAIL"), new_unit[:normal], times+1)
           when "CC" then
-            execute_instruction(point, unit*14/(36*16), times+1)
-            execute_instruction(@board.index("GO"), unit/(36*16), times+1)
-            execute_instruction(@board.index("JAIL"), unit/(36*16), times+1)
+            execute_instruction(point, new_unit[:card]*14, times+1)
+            execute_instruction(@board.index("GO"), new_unit[:card], times+1)
+            execute_instruction(@board.index("JAIL"), new_unit[:card], times+1)
           when "CH" then
-            execute_instruction(point, unit*6/(36*16), times+1)
-            execute_instruction(@board.index("GO"), unit/(36*16), times+1)
-            execute_instruction(@board.index("JAIL"), unit/(36*16), times+1)
-            execute_instruction(@board.index("C1"), unit/(36*16), times+1)
-            execute_instruction(@board.index("E3"), unit/(36*16), times+1)
-            execute_instruction(@board.index("H2"), unit/(36*16), times+1)
-            execute_instruction(@board.index("R1"), unit/(36*16), times+1)
-            execute_instruction(next_r(point), unit/(36*16), times+1)
-            execute_instruction((point-3+40)%40, unit/(36*16), times+1)
+            execute_instruction(point, new_unit[:card]*6, times+1)
+            execute_instruction(@board.index("GO"), new_unit[:card], times+1)
+            execute_instruction(@board.index("JAIL"), new_unit[:card], times+1)
+            execute_instruction(@board.index("C1"), new_unit[:card], times+1)
+            execute_instruction(@board.index("E3"), new_unit[:card], times+1)
+            execute_instruction(@board.index("H2"), new_unit[:card], times+1)
+            execute_instruction(@board.index("R1"), new_unit[:card], times+1)
+            execute_instruction(next_r(point), new_unit[:card], times+1)
+            execute_instruction((point-3+40)%40, new_unit[:card], times+1)
           end
         else
-          execute_instruction(point, unit/36, times+1)
+          execute_instruction(point, new_unit[:normal], times+1)
         end
       else
-        add_p(point, unit/36)
-        next
+        add_p(point, unit)
       end
     end
   end
 end
 
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-execute_instruction(0, (16**6)*(36**3), 1)
+execute_instruction(0, (16**6)*(36**2), 1)
 @p.map!.with_index{ |p, i| { p: p, i: i } }.sort_by!{ |h| -h[:p] } # .map!{ |h| h[:i] }
 p @p
