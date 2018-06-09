@@ -104,7 +104,7 @@ def next_r(point)
 end  
 
 def jumping_square?(point)
-  ['CC', 'CH', 'G2'].include?(@board[point][0..1]) && @board[point] != 'G2'
+  ['CC', 'CH'].include?(@board[point][0..1]) || @board[point] == 'G2J'
 end
 
 def ch3?(point)
@@ -113,6 +113,7 @@ end
 
 # unitは1/36を表す
 def add_p(point, unit)
+  # p "#{point}, #{unit}"
   if ch3?(point) # CH3
     @p[point] += (unit/16)*6
     @p[@board.index("GO")] += (unit/16)
@@ -151,12 +152,14 @@ def add_p(point, unit)
 end
 
 def execute_instruction(point, unit, times)
-  p "execute_instruction(#{point}, #{unit}, #{times})"
+  p "#{' '*(times-1)}execute_instruction(#{@board[point]}(#{point}), #{unit}, #{times})"
+  original_point = point
   @diceroll_table.each_with_index do |row, i|
     next if row.nil?
     row.each_with_index do |num, j|
       next if num.nil?
-      point = (point+num)%40
+      point = (original_point+num)%40
+      p "#{' '*(times-1)}point: #{@board[point]}(#{point}), num: #{num}"
       if i == j # ゾロ目
         new_unit = { normal: unit/36, card: unit/(36*16), ch3: unit/(36*16*16) }
         if times >= 3
@@ -198,13 +201,15 @@ def execute_instruction(point, unit, times)
           execute_instruction(point, new_unit[:normal], times+1)
         end
       else
+        # p "add_p(#{@board[point]}, #{unit})"
         add_p(point, unit)
       end
     end
   end
 end
 
+p @diceroll_table
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-execute_instruction(0, (16**6)*(36**2), 1)
+execute_instruction(0, (16**4)*(36**3), 1)
 @p.map!.with_index{ |p, i| { p: p, i: i } }.sort_by!{ |h| -h[:p] } # .map!{ |h| h[:i] }
 p @p
