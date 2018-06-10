@@ -103,6 +103,12 @@ def next_r(point)
   r_map.find{ |r| point < r } || 5
 end  
 
+def next_u(point)
+  u_map = @board.select{ |sq| sq[0] == "U" }.map{ |sq| @board.index(sq) }.sort
+  u_map.find{ |u| point < u } || 12
+end  
+
+
 def jumping_square?(point)
   ['CC', 'CH'].include?(@board[point][0..1]) || @board[point] == 'G2J'
 end
@@ -144,6 +150,7 @@ def add_p(point, unit)
       @p[@board.index("H2")] += (unit/16)
       @p[@board.index("R1")] += (unit/16)
       @p[next_r(point)] += (unit/16)*2
+      @p[next_u(point)] += (unit/16)
       @p[(point-3+40)%40] += (unit/16)
     end
   else
@@ -173,7 +180,8 @@ def execute_instruction(point, unit, times)
           execute_instruction(@board.index("E3"), new_unit[:card], times+1)
           execute_instruction(@board.index("H2"), new_unit[:card], times+1)
           execute_instruction(@board.index("R1"), new_unit[:card], times+1)
-          execute_instruction(next_r(point), new_unit[:card], times+1)
+          execute_instruction(next_r(point), new_unit[:card]*2, times+1)
+          execute_instruction(next_u(point), new_unit[:card], times+1)
 
           execute_instruction(point, new_unit[:ch3]*14, times+1)
           execute_instruction(@board.index("GO"), new_unit[:ch3], times+1)
@@ -194,7 +202,8 @@ def execute_instruction(point, unit, times)
             execute_instruction(@board.index("E3"), new_unit[:card], times+1)
             execute_instruction(@board.index("H2"), new_unit[:card], times+1)
             execute_instruction(@board.index("R1"), new_unit[:card], times+1)
-            execute_instruction(next_r(point), new_unit[:card], times+1)
+            execute_instruction(next_r(point), new_unit[:card]*2, times+1)
+            execute_instruction(next_u(point), new_unit[:card], times+1)
             execute_instruction((point-3+40)%40, new_unit[:card], times+1)
           end
         else
