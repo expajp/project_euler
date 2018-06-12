@@ -28,6 +28,10 @@ end
   "G2J", "G1", "G2", "CC3", "G3", "R4", "CH3", "H1", "T2", "H2"
 ] # 各マスの名称はunique
 
+def diceroll(max)
+  rand(max)+1
+end
+
 def next_r(point)
   r_map = @board.select{ |sq| sq[0] == "R" }.map{ |sq| @board.index(sq) }.sort
   r_map.find{ |r| point < r } || 5
@@ -46,3 +50,21 @@ def ch3?(point)
   @board[point] == 'CH3'
 end
 
+@p = []
+40.times{ |i| @p[i] = 0 }
+
+max = 6
+point = @board.index("GO")
+10000000.times do |i|
+  loop do
+    first = diceroll(max)
+    second = diceroll(max)
+    point = (point+first+second)%40
+    break if first != second
+  end
+  @p[point] += 1
+end
+
+sum = @p.sum
+@p.map!{ |i| i/sum.to_f*100 }
+p @p
