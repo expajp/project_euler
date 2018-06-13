@@ -103,8 +103,14 @@ def next_r(point)
   r_map.find{ |r| point < r } || 5
 end  
 
+def next_u(point)
+  u_map = @board.select{ |sq| sq[0] == "U" }.map{ |sq| @board.index(sq) }.sort
+  u_map.find{ |u| point < u } || 12
+end  
+
+
 def jumping_square?(point)
-  ['CC', 'CH', 'G2'].include?(@board[point][0..1]) && @board[point] != 'G2'
+  ['CC', 'CH'].include?(@board[point][0..1]) || @board[point] == 'G2J'
 end
 
 def ch3?(point)
@@ -113,6 +119,7 @@ end
 
 # unitは1/36を表す
 def add_p(point, unit)
+  # p "#{point}, #{unit}"
   if ch3?(point) # CH3
     @p[point] += (unit/16)*6
     @p[@board.index("GO")] += (unit/16)
@@ -143,6 +150,7 @@ def add_p(point, unit)
       @p[@board.index("H2")] += (unit/16)
       @p[@board.index("R1")] += (unit/16)
       @p[next_r(point)] += (unit/16)*2
+      @p[next_u(point)] += (unit/16)
       @p[(point-3+40)%40] += (unit/16)
     end
   else
@@ -151,12 +159,14 @@ def add_p(point, unit)
 end
 
 def execute_instruction(point, unit, times)
-  p "execute_instruction(#{point}, #{unit}, #{times})"
+  p "#{' '*(times-1)}execute_instruction(#{@board[point]}(#{point}), #{unit}, #{times})"
+  original_point = point
   @diceroll_table.each_with_index do |row, i|
     next if row.nil?
     row.each_with_index do |num, j|
       next if num.nil?
-      point = (point+num)%40
+      point = (original_point+num)%40
+      p "#{' '*(times-1)}point: #{@board[point]}(#{point}), num: #{num}"
       if i == j # ゾロ目
         new_unit = { normal: unit/36, card: unit/(36*16), ch3: unit/(36*16*16) }
         if times >= 3
@@ -170,7 +180,8 @@ def execute_instruction(point, unit, times)
           execute_instruction(@board.index("E3"), new_unit[:card], times+1)
           execute_instruction(@board.index("H2"), new_unit[:card], times+1)
           execute_instruction(@board.index("R1"), new_unit[:card], times+1)
-          execute_instruction(next_r(point), new_unit[:card], times+1)
+          execute_instruction(next_r(point), new_unit[:card]*2, times+1)
+          execute_instruction(next_u(point), new_unit[:card], times+1)
 
           execute_instruction(point, new_unit[:ch3]*14, times+1)
           execute_instruction(@board.index("GO"), new_unit[:ch3], times+1)
@@ -191,20 +202,23 @@ def execute_instruction(point, unit, times)
             execute_instruction(@board.index("E3"), new_unit[:card], times+1)
             execute_instruction(@board.index("H2"), new_unit[:card], times+1)
             execute_instruction(@board.index("R1"), new_unit[:card], times+1)
-            execute_instruction(next_r(point), new_unit[:card], times+1)
+            execute_instruction(next_r(point), new_unit[:card]*2, times+1)
+            execute_instruction(next_u(point), new_unit[:card], times+1)
             execute_instruction((point-3+40)%40, new_unit[:card], times+1)
           end
         else
           execute_instruction(point, new_unit[:normal], times+1)
         end
       else
+        # p "add_p(#{@board[point]}, #{unit})"
         add_p(point, unit)
       end
     end
   end
 end
 
+p @diceroll_table
 @p = @board.dup.map{ |elm| elm = 0 } # 各マスに止まる確率
-execute_instruction(0, (16**6)*(36**2), 1)
+execute_instruction(0, (16**4)*(36**3), 1)
 @p.map!.with_index{ |p, i| { p: p, i: i } }.sort_by!{ |h| -h[:p] } # .map!{ |h| h[:i] }
 p @p
