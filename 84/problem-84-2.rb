@@ -7,19 +7,6 @@
 とりあえず、2.5%になる設定を考える
 =end
 
-dice = 6
-
-# サイコロの出目
-# すべての確率は等しいので、これを舐めれば全条件の検証になる
-# 問題に回答するとき、ここの6を4にする
-@diceroll_table = []
-1.upto(dice) do |i|
-  @diceroll_table[i] = []
-  1.upto(dice) do |j|
-    @diceroll_table[i][j] = i+j
-  end
-end
-
 # 盤面
 @board = [
   "GO", "A1", "CC1", "A2", "T1", "R1", "B1", "CH1", "B2", "B3",
@@ -27,6 +14,16 @@ end
   "FP", "E1", "CH2", "E2", "E3", "R3", "F1", "F2", "U2", "F3",
   "G2J", "G1", "G2", "CC3", "G3", "R4", "CH3", "H1", "T2", "H2"
 ] # 各マスの名称はunique
+
+@cc = [
+  "GO", "JAIL", nil, nil, nil, nil, nil, nil,
+  nil, nil, nil, nil, nil, nil, nil, nil
+]
+
+@ch = [
+  "GO", "JAIL", "C1", "E3", "H2", "R1", "next_r", "next_r",
+  "next_u", "back_by_3", nil, nil, nil, nil, nil, nil
+]
 
 def diceroll(max)
   rand(max)+1
@@ -50,21 +47,72 @@ def ch3?(point)
   @board[point] == 'CH3'
 end
 
+def draw_on_ch(np)
+  ret = @ch.shift
+  @ch.push(ret)
+  case ret
+  when "next_r"
+    next_r(np)
+  when "next_u"
+    next_u(np)
+  when "back_by_3"
+    nnp = (np-3+40)%40
+    ch3?(np) ? draw_on_cc(nnp) : nnp
+  when nil
+    np
+  else
+    @board.index(ret)
+  end
+end
+
+def draw_on_cc(np)
+  ret = @cc.shift
+  @cc.push(ret)
+  ret.nil? ? np : @board.index(ret)
+end
+
+def next_point(point, a, b)
+  np = (point+a+b)%40
+  if jumping_square?(np)
+    case @board[np][0..1]
+    when 'G2'
+      return @board.index('JAIL')
+    when 'CC'
+      return draw_on_cc(np)
+    when 'CH'
+      return draw_on_ch(np)
+    end
+  else
+    return np
+  end
+end
+
+def sequence(point, times, max)
+  return @board.index('JAIL') if times == 4
+  a = diceroll(max)
+  b = diceroll(max)
+  point = next_point(point, a, b)
+  
+  if a == b
+    sequence(point, times+1, max)
+  else
+    point
+  end
+end
+
 @p = []
 40.times{ |i| @p[i] = 0 }
 
-max = 6
+max = 4
 point = @board.index("GO")
+@ch.shuffle!
+@cc.shuffle!
+
 10000000.times do |i|
-  loop do
-    first = diceroll(max)
-    second = diceroll(max)
-    point = (point+first+second)%40
-    break if first != second
-  end
+  point = sequence(point, 1, max)
   @p[point] += 1
 end
 
 sum = @p.sum
-@p.map!{ |i| i/sum.to_f*100 }
+@p.map!.with_index{ |p, i| { p: (p/sum.to_f*100).round(3), i: i } }.sort_by!{ |h| -h[:p] } # .map!{ |h| h[:i] }
 p @p
