@@ -8,5 +8,23 @@
 =end
 
 # 長方形の横、縦の長さ
-rectangle = [3, 2]
+answers = []
 
+width = 3
+loop do
+  p "width: #{width}"
+  1.upto(width) do |height|
+    rectangles = 0
+    
+    1.upto(width) do |w|
+      1.upto(height) do |h|
+        rectangles += (width-(w-1))*(height-(h-1))
+      end
+    end
+    answers << { area: width*height, rectangles: rectangles } if rectangles > 1990000 && rectangles < 2000000
+  end
+  width += 1
+  break if width > 200
+end
+
+p answers.sort{ |a, b| b[:rectangles] <=> a[:rectangles] }
