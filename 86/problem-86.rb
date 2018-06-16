@@ -15,21 +15,18 @@ def square?(n)
   (Math.sqrt(n).floor)**2 == n
 end
 
-m = 1
+count = 0
+max = 1
 loop do
-  count = 0
-  1.upto(m) do |max|
-    1.upto(max) do |mid|
-      1.upto(mid) do |min|
-        edges = [min, mid, max]
-        if square?(edges.map{ |short| short**2+(edges.sum-short)**2 }.min)
-          count += 1
-        end
+  1.upto(max) do |mid|
+    1.upto(mid) do |min|
+      edges = [min, mid, max]
+      if square?(edges.map{ |short| short**2+(edges.sum-short)**2 }.min)
+        count += 1
       end
     end
   end
-  p "m: #{m}, count: #{count}"
-  break if count > 2000
-  m += 1
+  p "max: #{max}, count: #{count}"
+  break if count > 1000000
+  max += 1
 end
-
