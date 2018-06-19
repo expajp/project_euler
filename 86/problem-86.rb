@@ -14,28 +14,41 @@
 原始ピタゴラス数とは、a, b, cのうち任意の2つが互いに素になるピタゴラス数
 例えば、3, 4, 5
 このとき、a = m^2-n^2, b = 2mn, c = m^2+n^2
+
+また、最短経路となるのは、辺をmin<mid<maxとすると、
+sqrt((min+mid)**2+max**2)
+である
+
 つまり、
-a, bは偶奇が異なる
-a, bともに素数ではない
-の特徴を持つのでここから処理量を減らせる
+maxが偶数の場合、
+ max/2を素因数分解して、2値a, bの積にする（a<b）
+ そこからmin+midの集合を求める
+maxが奇数の場合、
+ maxを素因数分解して、奇数a, bの積にする（a<b）
+ a=m-n, b=m+nなので、和を取ると2m, 差を取ると2n
+ これらの積を2で割ることで2mnを求め、min+midの集合を求める
+
+とりあえずこれで実装し、網羅性があるかどうか調べる
 =end
+
+require 'prime'
 
 def square?(n)
   (Math.sqrt(n).floor)**2 == n
 end
 
 count = 0
-max = 1
+max = 0
 loop do
+  max += 1
+  next if max.prime?
   1.upto(max) do |mid|
     1.upto(mid) do |min|
-      edges = [min, mid, max]
-      if square?(edges.map{ |short| short**2+(edges.sum-short)**2 }.min)
-        count += 1
-      end
+      next if mid%2 == min%2
+      next if (mid+min).prime?
+      count += 1 if square?((min+mid)**2+max**2)
     end
   end
   p "max: #{max}, count: #{count}"
   break if count > 1000000
-  max += 1
 end
