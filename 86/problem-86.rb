@@ -42,13 +42,17 @@ max = 0
 loop do
   max += 1
   next if max.prime?
-  1.upto(max) do |mid|
-    1.upto(mid) do |min|
-      next if mid%2 == min%2
-      next if (mid+min).prime?
-      count += 1 if square?((min+mid)**2+max**2)
+  next if max%2 == 1 # 先に偶数を実装
+
+  longs = []
+  pd = (max/2).prime_division
+  pd.each do |p|
+    0.upto(p[1]) do |n|
+      longs << ((p[0]**n)**2 - ((max/2)/p[0]**n)**2).abs
     end
   end
+  longs.uniq!
+  p longs
   p "max: #{max}, count: #{count}"
-  break if count > 1000000
+  break if max > 10
 end
