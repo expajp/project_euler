@@ -37,20 +37,48 @@ def square?(n)
   (Math.sqrt(n).floor)**2 == n
 end
 
+def divisors(n)
+  divisors = [1]
+  primes = []
+  n.prime_division.each do |prime|
+    prime[1].times {primes << prime[0]}
+  end
+
+  1.upto(primes.size) do |i|
+    primes.combination(i) do |prime|
+      divisors << prime.inject{|a,b| a *= b}
+    end
+  end
+  
+  divisors.uniq!
+  divisors.sort!
+  return divisors
+rescue ZeroDivisionError
+  return
+end
+
 count = 0
 max = 1
 loop do
   max += 1
   next if max.prime?
   if max%2 == 0 # maxが偶数
-    pd = (max/2).prime_division
-    p pd.map{ |a| a[1]+1 }.inject(:*)
-    count += pd.map{ |a| a[1]+1 }.inject(:*)
+    divisors(max/2).each do |n|
+      m = max/(2*n)
+      break if n > m
+      a = m**2 - n**2
+      next if a > max*2
+      count += (a < max ? a/2 : max-(a/2)+1)
+    end
   else # maxが奇数
-    pd = max.prime_division
-    p pd.map{ |a| a[1]+1 }.inject(:*)
-    count += pd.map{ |a| a[1]+1 }.inject(:*)
+    divisors(max).each do |minus|
+      plus = max/minus
+      break if minus > plus
+      b = (plus+minus)*(plus-minus)/2
+      next if b > max*2
+      count += (b < max ? b/2 : max-(b/2)+1)
+    end
   end
   p "max: #{max}, count: #{count}"
-  break if count > 2000
+  break if max > 99
 end
