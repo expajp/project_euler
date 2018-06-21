@@ -38,21 +38,19 @@ def square?(n)
 end
 
 count = 0
-max = 0
+max = 1
 loop do
   max += 1
   next if max.prime?
-  next if max%2 == 1 # 先に偶数を実装
-
-  longs = []
-  pd = (max/2).prime_division
-  pd.each do |p|
-    0.upto(p[1]) do |n|
-      longs << ((p[0]**n)**2 - ((max/2)/p[0]**n)**2).abs
-    end
+  if max%2 == 0 # maxが偶数
+    pd = (max/2).prime_division
+    p pd.map{ |a| a[1]+1 }.inject(:*)
+    count += pd.map{ |a| a[1]+1 }.inject(:*)
+  else # maxが奇数
+    pd = max.prime_division
+    p pd.map{ |a| a[1]+1 }.inject(:*)
+    count += pd.map{ |a| a[1]+1 }.inject(:*)
   end
-  longs.uniq!
-  p longs
   p "max: #{max}, count: #{count}"
-  break if max > 10
+  break if count > 2000
 end
