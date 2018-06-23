@@ -65,20 +65,22 @@ loop do
   if max%2 == 0 # maxが偶数
     divisors(max/2).each do |n|
       m = max/(2*n)
-      break if n > m
+      break if n >= m
       a = m**2 - n**2
       next if a > max*2
-      count += (a < max ? a/2 : max-(a/2)+1)
+      p "max: #{max}, min+mid: #{a}, patterns: #{(a < max ? (a/2.0).ceil : (a/2.0).floor-(a-max)+1)}"
+      count += (a < max ? (a/2.0).ceil : (a/2.0).floor-(a-max)+1)
     end
   else # maxが奇数
     divisors(max).each do |minus|
       plus = max/minus
-      break if minus > plus
+      break if minus >= plus
       b = (plus+minus)*(plus-minus)/2
       next if b > max*2
-      count += (b < max ? b/2 : max-(b/2)+1)
+      p "max: #{max}, min+mid: #{b}, patterns: #{(b < max ? (b/2.0).ceil : (b/2.0).floor-(b-max)+1)}"
+      count += (b < max ? (b/2.0).ceil : (b/2.0).floor-(b-max)+1)
     end
   end
   p "max: #{max}, count: #{count}"
-  break if max > 99
+  break if count > 2000
 end
