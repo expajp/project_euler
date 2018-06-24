@@ -61,14 +61,14 @@ count = 0
 max = 1
 loop do
   max += 1
-  next if max.prime?
+  # next if max.prime?
   if max%2 == 0 # maxが偶数
     divisors(max/2).each do |n|
       m = max/(2*n)
       break if n >= m
       a = m**2 - n**2
       next if a > max*2
-      p "max: #{max}, min+mid: #{a}, patterns: #{(a < max ? (a/2.0).ceil : (a/2.0).floor-(a-max)+1)}"
+      # p "max: #{max}, min+mid: #{a}, patterns: #{(a < max ? (a/2.0).ceil : (a/2.0).floor-(a-max)+1)}"
       count += (a < max ? (a/2.0).ceil : (a/2.0).floor-(a-max)+1)
     end
   else # maxが奇数
@@ -77,10 +77,11 @@ loop do
       break if minus >= plus
       b = (plus+minus)*(plus-minus)/2
       next if b > max*2
-      p "max: #{max}, min+mid: #{b}, patterns: #{(b < max ? (b/2.0).ceil : (b/2.0).floor-(b-max)+1)}"
+      # p "max: #{max}, min+mid: #{b}, patterns: #{(b < max ? (b/2.0).ceil : (b/2.0).floor-(b-max)+1)}"
       count += (b < max ? (b/2.0).ceil : (b/2.0).floor-(b-max)+1)
     end
   end
   p "max: #{max}, count: #{count}"
   break if count > 2000
 end
+
