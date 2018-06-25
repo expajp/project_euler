@@ -28,6 +28,7 @@ loop do
     end
   end
   p "max: #{max}, count: #{count}"
-  break if max > 10
+  break if max > 28
+  # break if count > 2000
   max += 1
 end
