@@ -23,10 +23,11 @@ loop do
       edges = [min, mid, max]
       if square?(edges.map{ |short| short**2+(edges.sum-short)**2 }.min)
         count += 1
+        p "max: #{max}, min, mid: #{min} #{mid} #{min+mid}"
       end
     end
   end
   p "max: #{max}, count: #{count}"
-  break if count > 2000
+  break if max > 10
   max += 1
 end
