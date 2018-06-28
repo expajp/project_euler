@@ -15,11 +15,19 @@
 require 'prime'
 
 max = 50000000
-primes = Prime.each(7071).to_a
+primes = [
+  Prime.each((max**(1/2.0)).floor.to_i).to_a,
+  Prime.each((max**(1/3.0)).floor.to_i).to_a,
+  Prime.each((max**(1/4.0)).floor.to_i).to_a
+]
 answers = []
-primes.repeated_permutation(3) do |a|
-  val = a.map.with_index{ |n, i| n**(i+2) }.sum
-  answers << val if val < max
+primes[0].each do |sq|
+  primes[1].each do |cb|
+    primes[2].each do |biq|
+      val = sq**2 + cb**3 + biq**4
+      answers << val if val < max
+    end
+  end
 end
 
 p answers.uniq.length
