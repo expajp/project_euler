@@ -29,5 +29,62 @@ k=6: 12 = 1 × 1 × 1 × 1 × 2 × 6 = 1 + 1 + 1 + 1 + 2 + 6
 項の数＋補った1の数がkになる
 12000より大きい数はハネ、
 数が12000-1個になった時点で処理をストップする
+---
+
+小さいnから順に、1を除く
+
+
 =end
 
+require 'prime'
+
+divisors_arr = [nil, nil]
+
+def divisors(n)
+  return divisors_arr[n] unless divisors_arr[n].nil?
+  divisors = []
+  primes = []
+  n.prime_division.each do |prime|
+    prime[1].times {primes << prime[0]}
+  end
+
+  1.upto(primes.size) do |i|
+    primes.combination(i) do |prime|
+      divisors << prime.inject{|a,b| a *= b}
+    end
+  end
+  
+  divisors.uniq!
+  divisors.sort!
+  return divisors
+rescue ZeroDivisionError
+  return
+end
+
+arr = [nil, nil]
+max = 6
+k = 1
+
+n = 3
+loop do
+  n += 1
+  break if n > 12
+  next if n.prime?
+  
+  pd = Prime.prime_division(n)
+  p_num = pd.map{ |a| a[1] }.sum
+  p_all = []
+  pd.each{ |a| a[1].times{ p_all << a[0] } }
+  p "n: #{n}, pd: #{pd}, p_num: #{p_num}, p_all: #{p_all}"
+  next if p_all.length < k
+  p_all.combination(k).to_a.uniq.each do |c|
+    sum = c.sum
+    p "c: #{c}, sum: #{sum}"
+    next if sum > n
+    k =  k + (n-sum)
+    arr[k] = n
+  end
+  p arr
+end
+
+p arr[2..max].uniq
