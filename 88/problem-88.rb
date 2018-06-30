@@ -30,10 +30,11 @@ k=6: 12 = 1 × 1 × 1 × 1 × 2 × 6 = 1 + 1 + 1 + 1 + 2 + 6
 12000より大きい数はハネ、
 数が12000-1個になった時点で処理をストップする
 ---
-
-小さいnから順に、1を除く
-
-
+nを順番に調べる
+あるnについて、素因数を格納した配列aを作る
+aの長さをlとして、l以下の長さのcombinationを作る
+各combinationについて、和と積(= n)の差を取ってkを求める
+aの長さは高々知れているので、計算可能
 =end
 
 require 'prime'
@@ -63,8 +64,6 @@ end
 
 arr = [nil, nil]
 max = 6
-k = 1
-
 n = 3
 loop do
   n += 1
@@ -76,15 +75,7 @@ loop do
   p_all = []
   pd.each{ |a| a[1].times{ p_all << a[0] } }
   p "n: #{n}, pd: #{pd}, p_num: #{p_num}, p_all: #{p_all}"
-  next if p_all.length < k
-  p_all.combination(k).to_a.uniq.each do |c|
-    sum = c.sum
-    p "c: #{c}, sum: #{sum}"
-    next if sum > n
-    k =  k + (n-sum)
-    arr[k] = n
-  end
-  p arr
+  # todo
 end
 
 p arr[2..max].uniq
