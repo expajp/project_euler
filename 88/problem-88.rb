@@ -63,11 +63,10 @@ rescue ZeroDivisionError
 end
 
 arr = [nil, nil]
-max = 6
+max = 12000
 n = 3
 loop do
   n += 1
-  break if n > 12
   next if n.prime?
   
   pd = Prime.prime_division(n)
@@ -75,7 +74,14 @@ loop do
   p_all = []
   pd.each{ |a| a[1].times{ p_all << a[0] } }
   p "n: #{n}, pd: #{pd}, p_num: #{p_num}, p_all: #{p_all}"
-  # todo
+  1.upto(p_all.length-1) do |l|
+    p_all.combination(l) do |c|
+      c << n/c.inject(:*)
+      k = c.length+(n-c.sum)
+      arr[k] = n if arr[k].nil? && k <= max
+    end
+  end
+  break if arr.length == max+1 && !arr[2..max].include?(nil)
 end
 
-p arr[2..max].uniq
+p arr[2..max].uniq.sum
