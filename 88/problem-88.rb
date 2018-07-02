@@ -39,10 +39,7 @@ aの長さは高々知れているので、計算可能
 
 require 'prime'
 
-divisors_arr = [nil, nil]
-
 def divisors(n)
-  return divisors_arr[n] unless divisors_arr[n].nil?
   divisors = []
   primes = []
   n.prime_division.each do |prime|
@@ -62,26 +59,34 @@ rescue ZeroDivisionError
   return
 end
 
+def products(n)
+  return [[]] if n == 1
+  ret = []
+  divisors(n).each do |d|
+    products(n/d).map{ |prd| [d, prd].flatten }.each{ |a| ret << a }    
+  end
+  ret.map(&:sort).uniq
+end
+
 arr = [nil, nil]
 max = 12000
 n = 3
 loop do
   n += 1
   next if n.prime?
-  
-  pd = Prime.prime_division(n)
-  p_num = pd.map{ |a| a[1] }.sum
-  p_all = []
-  pd.each{ |a| a[1].times{ p_all << a[0] } }
-  p "n: #{n}, pd: #{pd}, p_num: #{p_num}, p_all: #{p_all}"
-  1.upto(p_all.length-1) do |l|
-    p_all.combination(l) do |c|
-      c << n/c.inject(:*)
-      k = c.length+(n-c.sum)
-      arr[k] = n if arr[k].nil? && k <= max
+
+  pds = products(n)
+  pds.each do |pd|
+    k = pd.length+(n-pd.sum)
+    if arr[k].nil? && k <= max
+      arr[k] = n
+      p pd
+      p "arr[#{k}] = #{n}"
     end
   end
   break if arr.length == max+1 && !arr[2..max].include?(nil)
 end
 
+# p arr[2..max].uniq
 p arr[2..max].uniq.sum
+
