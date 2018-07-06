@@ -32,7 +32,13 @@ squares = [*1..9].map{ |i| i**2 }
 count = 0
 patterns.each do |combi|
   check = squares.map do |sq|
-    true
+    if sq < 10
+      (combi[0].include?(sq) && combi[1].include?(0)) ||
+        (combi[0].include?(0) && combi[1].include?(sq))
+    else
+      (combi[0].include?(sq/10) && combi[1].include?(sq%10)) ||
+        (combi[0].include?(sq%10) && combi[1].include?(sq/10))
+    end
   end
   count += 1 if check
 end
