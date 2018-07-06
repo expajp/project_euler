@@ -23,10 +23,11 @@ p_090.gif
 すべての平方数を表示し得る2つの立方体の異なる配列の組はいくつあるか.
 =end
 
-patterns = [*0..8].combination(6).to_a.map do |a|
-  a << 9 if a.include?(6)
-  a
-end.combination(2).to_a
+patterns = [*0..9].combination(6).to_a.map do |a|
+  a << 9 if a.include?(6) && !a.include?(9)
+  a << 6 if a.include?(9) && !a.include?(6)
+  a.uniq
+end.repeated_combination(2).to_a.uniq
 
 squares = [*1..9].map{ |i| i**2 }
 count = 0
@@ -39,7 +40,7 @@ patterns.each do |combi|
       (combi[0].include?(sq/10) && combi[1].include?(sq%10)) ||
         (combi[0].include?(sq%10) && combi[1].include?(sq/10))
     end
-  end
+  end.inject(:&)
   count += 1 if check
 end
 p count
