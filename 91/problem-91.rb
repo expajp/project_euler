@@ -9,11 +9,9 @@
 では, 0 ≤ x1, y1, x2, y2 ≤ 50のとき, 直角三角形は何個作れるか?
 =end
 
-p_sets = [*0..2].repeated_combination(2).to_a
+p_sets = [*0..50].repeated_permutation(2).to_a
            .reject{ |p| p == [0, 0]}
            .combination(2).to_a
-           .reject{ |a| (a[0][0] == 0 && a[1][0] == 0) ||
-                    (a[0][0] != 0 && a[1][0] != 0 && (a[0][1]/a[0][0]).to_f == (a[1][1]/a[1][0]).to_f) }
 
 count = 0
 p_sets.each do |set|
