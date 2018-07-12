@@ -25,13 +25,21 @@ answer = nil
   arr = []
   set.permutation(4).each do |p|
     ['+', '-', '*', '/'].repeated_permutation(3) do |ops|
-      exp = p[0].to_s
+      elm_exp = p[0].to_s
+      denomi_exp = '1'
       ops.each_with_index do |op, i|
-        exp = "#{exp}#{op}#{p[i+1]}"
-        exp = "(#{exp})" if ['+', '-'].include?(op)
+        if op == '+' || op == '-'
+          elm_exp = "(#{elm_exp}#{op}#{p[i+1]})"
+        elsif op == '*'
+          elm_exp = "#{elm_exp}#{op}#{p[i+1]}"
+        else
+          denomi_exp = "#{denomi_exp}*#{p[i+1]}"
+        end
       end
-      next unless exp.index('/0').nil?
-      val = eval(exp)
+      elm = eval(elm_exp)
+      denomi = eval(denomi_exp)
+      next if denomi == 0 || elm%denomi != 0
+      val = elm/denomi
       arr << val if val > 0
     end
   end
