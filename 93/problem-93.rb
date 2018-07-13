@@ -18,29 +18,28 @@
 最長の連続した正の整数 1 から n の集合を得ることができる, 4 つの異なる数字 a < b < c < d を見つけよ. 答えを文字列 abcd として与えよ.
 =end
 
+operand = ['+', '-', '*', '/']
 n = 0
 answer = nil
 
 [*0..9].repeated_combination(4) do |set|
   arr = []
   set.permutation(4).each do |p|
-    ['+', '-', '*', '/'].repeated_permutation(3) do |ops|
-      elm_exp = p[0].to_s
-      denomi_exp = '1'
+    operand.repeated_permutation(3) do |ops|
+      elm = p[0]
+      denomi = 1
       ops.each_with_index do |op, i|
-        if op == '+' || op == '-'
-          elm_exp = "(#{elm_exp}#{op}#{p[i+1]})"
+        if op == '/'
+          denomi *= p[i+1]
         elsif op == '*'
-          elm_exp = "#{elm_exp}#{op}#{p[i+1]}"
+          elm *= p[i+1]
         else
-          denomi_exp = "#{denomi_exp}*#{p[i+1]}"
+          elm = eval("#{elm}#{op}#{p[i+1]}*#{denomi}")
         end
       end
-      elm = eval(elm_exp)
-      denomi = eval(denomi_exp)
-      next if denomi == 0 || elm%denomi != 0
+      next if denomi == 0 || elm%denomi != 0 || elm < 0
       val = elm/denomi
-      arr << val if val > 0
+      arr << val
     end
   end
 
