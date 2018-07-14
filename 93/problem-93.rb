@@ -26,20 +26,7 @@ answer = nil
   arr = []
   set.permutation(4).each do |p|
     operand.repeated_permutation(3) do |ops|
-      elm = p[0]
-      denomi = 1
-      ops.each_with_index do |op, i|
-        if op == '/'
-          denomi *= p[i+1]
-        elsif op == '*'
-          elm *= p[i+1]
-        else
-          elm = eval("#{elm}#{op}#{p[i+1]}*#{denomi}")
-        end
-      end
-      next if denomi == 0 || elm%denomi != 0 || elm < 0
-      val = elm/denomi
-      arr << val
+      
     end
   end
 
