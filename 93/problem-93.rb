@@ -18,75 +18,42 @@
 最長の連続した正の整数 1 から n の集合を得ることができる, 4 つの異なる数字 a < b < c < d を見つけよ. 答えを文字列 abcd として与えよ.
 =end
 
-def calc_a(p, ops)
-  return nil if p.include?(0) && ops.map.with_index{ |op, i| op == '/' && p[i+1] == 0 }
-  
-  elm = p[0]
-  denomi = 1
-  ops.each_with_index do |op, i|
-    if op == '*'
-      elm *= p[i+1]
-    elsif op == '/'
-      denomi *= p[i+1]
-    else
-      elm = eval("#{elm}#{op}#{denomi}*#{p[i+1]}")
-    end
+def ope(n, m, op)
+  return nil if (m == 0 && op == '/') || n.nil? || m.nil?
+  ret = nil
+  if op == '/'
+    ret = n*1.0/m
+  else
+    ret = eval("#{n}#{op}#{m}")
   end
-  return nil if elm%denomi != 0
-  return elm/denomi
+  return ret if ret == ret.to_i
+  nil
 end
 
-def calc_b(p, ops)
-  return nil if p.include?(0) && ops.map.with_index{ |op, i| op == '/' && p[i+1] == 0 }
-
-  elm_left = p[0]
-  denomi_left = 1
-  if ops[0] == '/'
-    denomi_left *= p[1]
-  else
-    elm_left = eval("#{elm_left}#{ops[2]}#{p[1]}")
-  end
- 
-  elm_right = p[2]
-  denomi_right = 1
-  if ops[2] == '/'
-    denomi_right *= p[3]
-  else
-    elm_right = eval("#{elm_right}#{ops[2]}#{p[3]}")
-  end
-
-  elm = 0
-  denomi = 1
-  if ops[1] == '*'
-    elm = elm_left*elm_right
-    denomi = denomi_left*denomi_right
-  elsif ops[1] == '/'
-    elm = elm_left*denomi_right
-    denomi = denomi_left*elm_right
-  else
-    elm = eval("#{elm_left}*#{denomi_right}#{ops[1]}#{elm_right}*#{denomi_left}")
-    denomi = denomi_left*denomi_right
-  end
-  
-  return nil if denomi == 0 || elm%denomi != 0
-  return elm/denomi
+def calc(p, ops)
+  ret = []
+  ret << ope(ope(ope(p[0], p[1], ops[0]), p[2], ops[1]), p[3], ops[2])
+  ret << ope(ope(p[0], ope(p[1], p[2], ops[1]), ops[0]), p[3], ops[2])
+  ret << ope(ope(p[0], p[1], ops[0]), ope(p[2], p[3], ops[2]), ops[1])
+  ret << ope(p[0], ope(ope(p[1], p[2], ops[1]), p[3], ops[2]), ops[0])
+  ret << ope(ope(p[0], p[1], ops[0]), ope(p[2], p[3], ops[2]), ops[1])
+  ret.reject(&:nil?).map(&:to_i)
 end
-
 
 operand = ['+', '-', '*', '/']
 n = 0
 answer = nil
 
-[*0..9].repeated_combination(4) do |set|
+set = [1,2,5,8]
+# [*0..9].repeated_combination(4) do |set|
   arr = []
   set.permutation(4).each do |p|
     operand.repeated_permutation(3) do |ops|
-      a = calc_a(p, ops)
-      arr << a unless a.nil?
-      b = calc_b(p, ops)
-      arr << b unless b.nil?
+      arr << calc(p, ops)
     end
   end
+  arr = arr.flatten.select{ |i| i > 0 }
+  p arr.uniq.sort if set == [1,2,5,8]
 
   arr.uniq.sort.each_cons(2) do |i, j|
     if i+1 != j
@@ -98,6 +65,6 @@ answer = nil
       break
     end
   end  
-end
+#end
 
 p "n=#{n}, answer=#{answer}"
