@@ -18,42 +18,77 @@
 最長の連続した正の整数 1 から n の集合を得ることができる, 4 つの異なる数字 a < b < c < d を見つけよ. 答えを文字列 abcd として与えよ.
 =end
 
+def max_common_div(a, b)
+  if a > b && b != 0
+    max_common_div(a%b, b)
+  elsif a < b && a != 0
+    max_common_div(a, b%a)
+  else
+    return (a > b ? a : b)
+  end
+end
+
+def convert_arr_to_fraction(p)
+  p.map{ |n| { elm: n, denomi: 1 } }
+end
+
 def ope(n, m, op)
-  return nil if (m == 0 && op == '/') || n.nil? || m.nil?
+  return nil if n.nil? || m.nil? || (m[:elm] == 0 && op == '/')
   ret = nil
   if op == '/'
-    ret = n*1.0/m
+    ret = { elm: n[:elm]*m[:denomi], denomi: n[:denomi]*m[:elm]  }
+  elsif op == '*'
+    ret = { elm: n[:elm]*m[:elm], denomi: n[:denomi]*m[:denomi]  }
   else
-    ret = eval("#{n}#{op}#{m}")
+    ret = {
+      elm: eval("#{n[:elm]}*#{m[:denomi]}#{op}#{m[:elm]}*#{n[:denomi]}"),
+      denomi: n[:denomi]*m[:denomi]
+    }
   end
-  return ret if ret == ret.to_i
-  nil
+  return ret
 end
 
 def calc(p, ops)
+  p = convert_arr_to_fraction(p)
   ret = []
+  
   ret << ope(ope(ope(p[0], p[1], ops[0]), p[2], ops[1]), p[3], ops[2])
   ret << ope(ope(p[0], ope(p[1], p[2], ops[1]), ops[0]), p[3], ops[2])
+  
+  ret << ope(ope(p[0], ope(p[1], p[2], ops[1]), ops[0]), p[3], ops[2])
   ret << ope(ope(p[0], p[1], ops[0]), ope(p[2], p[3], ops[2]), ops[1])
+
   ret << ope(p[0], ope(ope(p[1], p[2], ops[1]), p[3], ops[2]), ops[0])
+  ret << ope(p[0], ope(p[1], ope(p[2], p[3], ops[2]), ops[1]), ops[0])
+
   ret << ope(ope(p[0], p[1], ops[0]), ope(p[2], p[3], ops[2]), ops[1])
-  ret.reject(&:nil?).map(&:to_i)
+
+  ret.map do |val|
+    next if val.nil? || val[:elm] < 0 || val[:denomi] < 0
+    mcd = (val[:denomi] == 1 ? 1 : max_common_div(val[:elm], val[:denomi]))
+    { elm: val[:elm]/mcd, denomi: val[:denomi]/mcd }
+  end.reject{ |val| val.nil? || val[:elm] < 0 || val[:denomi] < 0 || val[:denomi] != 1 }
 end
 
 operand = ['+', '-', '*', '/']
 n = 0
 answer = nil
 
-set = [1,2,5,8]
-# [*0..9].repeated_combination(4) do |set|
+=begin
+p = convert_arr_to_fraction([1,2,5,8])
+ops = ['/', '+', '*']
+p calc(p, ops)
+=end
+
+# set = [1,2,5,8]
+[*1..9].repeated_combination(4) do |set|
   arr = []
   set.permutation(4).each do |p|
     operand.repeated_permutation(3) do |ops|
       arr << calc(p, ops)
     end
   end
-  arr = arr.flatten.select{ |i| i > 0 }
-  p arr.uniq.sort if set == [1,2,5,8]
+  arr = arr.flatten.map{ |val| val[:elm] }.select{ |i| i > 0 }
 
   arr.uniq.sort.each_cons(2) do |i, j|
     if i+1 != j
@@ -65,6 +100,6 @@ set = [1,2,5,8]
       break
     end
   end  
-#end
+end
 
 p "n=#{n}, answer=#{answer}"
