@@ -50,3 +50,36 @@ end
 max = 1_000_000_000
 sum = 0
 
+1.upto(Math.sqrt(max).floor.to_i) do |n|
+  p n
+  (n+1).step(Math.sqrt(max).floor.to_i, 2) do |m|
+    l = n*n + m*m
+    even = (((l+1)/2)%2 == 0)
+    [l-1, l+1].each do |bottom|
+      a = 2*n*m
+      b = m*m - n*n
+      if even
+        if square?(l+a)
+          round = l*2+bottom
+          i = 1
+          loop do
+            sum += round*i
+            i += 1
+            break if round*i > max
+          end
+        end
+      else
+        if square?((l+bottom/2)/2)
+          round = l*2+bottom
+          i = 1
+          loop do
+            sum += round*i
+            i += 1
+            break if round*i > max
+          end
+        end
+      end
+    end
+  end
+end
+p sum
