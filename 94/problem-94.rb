@@ -32,27 +32,16 @@ lが奇数ということは、m,nは片方が偶数でもう片方が奇数
 n = 1のときm = sqrt(10)*10000 ~= 30000程度かつn, mの偶奇が異なるので、これは総当たり可能
 =end
 
-def mcd(a, b)
-  if a > b && b != 0
-    mcd(a%b, b)
-  elsif a < b && a != 0
-    mcd(a, b%a)
-  else
-    return (a > b ? a : b)
-  end
-end
-
-def square?(n)
-  (Math.sqrt(n).floor.to_i)**2 == n
-end
-
 max = 1_000_000_000
 sum = 0
+searched = []
 
 1.upto(Math.sqrt(max).floor.to_i) do |n|
   p n
   (n+1).step(Math.sqrt(max).floor.to_i, 2) do |m|
     l = n*n + m*m
+    next if searched.include?(l)
+    searched.push(l)
     [l-1, l+1].each do |bottom|
       if (bottom/2).odd?
         b = m*m - n*n
