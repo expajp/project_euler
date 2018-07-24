@@ -40,17 +40,17 @@ searched = []
   p n
   (n+1).step(Math.sqrt(max).floor.to_i, 2) do |m|
     l = n*n + m*m
-    next if searched.include?(l)
-    searched.push(l)
+    next if 3*l-2 > max
     [l-1, l+1].each do |bottom|
+      next if 3*l+2 > max
       if (bottom/2).odd?
         b = m*m - n*n
-        sum += l*2+bottom if bottom/2 == b
+        searched.push l*2+bottom if bottom/2 == b
       else
         a = 2*n*m
-        sum += l*2+bottom if bottom/2 == a
+        searched.push l*2+bottom if bottom/2 == a
       end      
     end
   end
 end
-p sum
+p searched.uniq.sum
