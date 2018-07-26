@@ -41,3 +41,23 @@ class Integer
   end
 end
 
+max = 1000000
+answer_chain = []
+10.upto(max) do |n|
+  chain = []
+  val = n
+  over_flowed = false
+  loop do
+    val = val.to_i.divisors.sum
+    break if chain.include?(val) || val == 0
+    if val > max
+      over_flowed = true
+      break
+    end
+    chain << val
+  end
+  next if over_flowed || val == 0
+  p "n: #{n}, chain: #{chain}"
+  answer_chain = chain if chain.length > answer_chain.length
+end
+p answer_chain
