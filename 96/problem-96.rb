@@ -15,7 +15,14 @@
 =end
 
 File.open("sudoku.txt") do |f|
+  table = []
   f.each_line.with_index do |line, i|
-    
+    if line.match(/Grid [0-9]+/)
+      table = []
+    else
+      table[(i-1)%9] = line.gsub(/\n/, '').split('')
+    end
+    p table if i == 9
+    break if i == 9
   end
 end
