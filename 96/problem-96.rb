@@ -18,6 +18,22 @@
 =end
 
 def sequence(table)
+  table.each_with_index do |row, i|
+    row.each_with_index do |n, j|
+      next if n != 0
+      block = table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
+      collection = (row+table.transpose[j]+block).reject{ |n| n == 0 }.uniq
+      if collection.length == 8
+        table[i][j] = ([*1..9]-collection).first
+        return table
+      else
+        nominated = [*1..9]-collection
+        nominated.each do |m|
+          # mがありえない値ならばnominatedから削除
+        end
+      end
+    end
+  end
   table
 end
 
@@ -41,11 +57,15 @@ File.open("sudoku.txt") do |f|
     if i%10 == 9
       loop do
         table = sequence(table)
-        break
+        view(table)
+        p ""
+        p ""
+        break unless table.flatten.find{ |n| n == 0 }
       end
       answer += table[0][0..2].map(&:to_s).join('').to_i
       view(table) if i%10 == 9
     end
-    break if i == 9
+    break if i == 19
   end
 end
+p answer
