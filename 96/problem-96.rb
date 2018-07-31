@@ -11,9 +11,24 @@
 6kバイトのテキストファイルfilesudoku.txt(右クリックで,"名前をつけてリンク先を保存") にはただ一つの解を持つ, 様々な難易度の50の"数独"パズルが含まれている(上の例題はこのファイルにおける最初のパズルである).
 
 50すべてのパズルを解き, それぞれの解答の左上隅にある3桁の数の合計を求めよ; 例えば483は上の解答例の左上隅の3桁の数である.
+---
+
+各0についてタテ、横、箱の3つを調べて埋める、を無限ループで繰り返す
 
 =end
 
+def sequence(table)
+  table
+end
+
+def view(table)
+  table.each_with_index do |row, i|
+    p row[0..2].join('') + ' ' + row[3..5].join('') + ' ' + row[6..8].join('')
+    p '' if i%3 == 2 && i != 8
+  end
+end
+
+answer = 0
 File.open("sudoku.txt") do |f|
   table = []
   f.each_line.with_index do |line, i|
@@ -23,7 +38,14 @@ File.open("sudoku.txt") do |f|
     else
       table[i%10-1] = line.gsub(/\n/, '').split('').map(&:to_i)
     end
-    p table if i%10 == 9
+    if i%10 == 9
+      loop do
+        table = sequence(table)
+        break
+      end
+      answer += table[0][0..2].map(&:to_s).join('').to_i
+      view(table) if i%10 == 9
+    end
     break if i == 9
   end
 end
