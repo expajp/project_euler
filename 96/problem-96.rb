@@ -15,6 +15,10 @@
 
 各0についてタテ、横、箱の3つを調べて埋める、を無限ループで繰り返す
 
+---
+最も入りうる数字が少ない0を選び出す
+そこから深さ優先探索ですべての可能性が潰れるまで同様の処理を再帰的に続ける
+
 =end
 
 def sequence(table)
@@ -27,10 +31,6 @@ def sequence(table)
       if collection.length == 8
         table[i][j] = ([*1..9]-collection).first
         return table
-      else
-        nominated = [*1..9]-collection
-        nominated.dup.each{ |m| nominated.delete(m) if cross_and_block.include?(m) }
-        table[i][j] = nominated.first if nominated.length == 1
       end
     end
   end
@@ -44,6 +44,20 @@ def view(table)
   end
 end
 
+def compare_table(a, b)
+  a.map.with_index{ |row, i| row == b[i] }.all?
+end
+
+def copy_table(table)
+  ret = []
+  table.each_with_index{ |row, i| ret[i] = row.dup }
+  ret
+end
+
+def cleared?(sudoku)
+  !(sudoku.flatten.find{ |n| n == 0 })
+end
+
 answer = 0
 File.open("sudoku.txt") do |f|
   table = []
@@ -54,15 +68,18 @@ File.open("sudoku.txt") do |f|
     else
       table[i%10-1] = line.gsub(/\n/, '').split('').map(&:to_i)
     end
+    
     if i%10 == 9
+      before_table = copy_table(table)
       loop do
         table = sequence(table)
-        view(table)
-        p ""
-        p ""
-        break unless table.flatten.find{ |n| n == 0 }
+        break if cleared?(table) || compare_table(table, before_table)
+        before_table = copy_table(table)
       end
-      answer += table[0][0..2].map(&:to_s).join('').to_i
+      if before_table == table
+        # ここで深さ優先探索
+      end
+      answer += table[0][0..2].map(&:to_s).join('').to_i if cleared?(table)
       view(table) if i%10 == 9
     end
     break if i == 19
