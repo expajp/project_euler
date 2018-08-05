@@ -37,6 +37,28 @@ def sequence(table)
   table
 end
 
+def solve(table)
+  map = evaluation_map(table)
+  max = map.map{ |row| row.max }.max
+  # maxに合致する要素を探し、そこから深さ優先探索
+  # 1文字埋める、sequenceを使う、evaluation_mapを再作成、maxに合致する要素を探す
+  # これを再起を使って深さ優先探索
+end
+
+def evaluation_map(table)
+  table = table.map.with_index do |row, i|
+    row.map.with_index do |n, j|
+      if n != 0
+        0
+      else
+        block = table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
+        (row+table.transpose[j]+block).reject{ |n| n == 0 }.uniq.length
+      end      
+    end
+  end
+  table
+end
+
 def view(table)
   table.each_with_index do |row, i|
     p row[0..2].join('') + ' ' + row[3..5].join('') + ' ' + row[6..8].join('')
@@ -77,7 +99,7 @@ File.open("sudoku.txt") do |f|
         before_table = copy_table(table)
       end
       if before_table == table
-        # ここで深さ優先探索
+        solve(table)
       end
       answer += table[0][0..2].map(&:to_s).join('').to_i if cleared?(table)
       view(table) if i%10 == 9
