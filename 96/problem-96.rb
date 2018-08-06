@@ -38,11 +38,22 @@ def sequence(table)
 end
 
 def solve(table)
+  # ここにsequenceを使う処理を追加して状況に応じてreturn
+  # 呼び出し元の処理も少し変える
   map = evaluation_map(table)
   max = map.map{ |row| row.max }.max
-  # maxに合致する要素を探し、そこから深さ優先探索
+  points = points_from_val(table, max)
+
+  points.each do |point|
+    searching_table = copy_table(table)
+    nominated = nominated(searching_table, point)
+    nominated.each do |n|
+      searching_table[point[:i]][point[:j]] = n
+      solve(searching_table)
+    end
+  end
   # 1文字埋める、sequenceを使う、evaluation_mapを再作成、maxに合致する要素を探す
-  # これを再起を使って深さ優先探索
+  # これを再帰を使って深さ優先探索
 end
 
 def evaluation_map(table)
@@ -57,6 +68,22 @@ def evaluation_map(table)
     end
   end
   table
+end
+
+def points_from_val(table, val)
+  ret = []
+  table.each_with_index do |row, i|
+    row.each_with_index do |n, j|
+      ret << {i: i, j: j} if n == val
+    end
+  end
+  ret
+end
+
+def nominated(table, point)
+  row = table[point[:i]]
+  block = table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
+  [*1..9] - (row+table.transpose[point[:j]]+block).reject{ |n| n == 0 }.uniq
 end
 
 def view(table)
