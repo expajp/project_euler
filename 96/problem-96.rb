@@ -38,22 +38,31 @@ def sequence(table)
 end
 
 def solve(table)
-  # ここにsequenceを使う処理を追加して状況に応じてreturn
-  # 呼び出し元の処理も少し変える
+  # view(table)
+  
+  # 埋められる場所を埋める
+  before_table = copy_table(table)
+  loop do
+    table = sequence(table)
+    return table if cleared?(table)
+    break if compare_table(table, before_table)
+    before_table = copy_table(table)
+  end
+
   map = evaluation_map(table)
   max = map.map{ |row| row.max }.max
-  points = points_from_val(table, max)
+  points = points_from_val(map, max)
 
+  # p points
   points.each do |point|
     searching_table = copy_table(table)
     nominated = nominated(searching_table, point)
     nominated.each do |n|
       searching_table[point[:i]][point[:j]] = n
+      # view(searching_table)
       solve(searching_table)
     end
   end
-  # 1文字埋める、sequenceを使う、evaluation_mapを再作成、maxに合致する要素を探す
-  # これを再帰を使って深さ優先探索
 end
 
 def evaluation_map(table)
@@ -81,16 +90,20 @@ def points_from_val(table, val)
 end
 
 def nominated(table, point)
-  row = table[point[:i]]
+  i = point[:i]
+  j = point[:j]
+  row = table[i]
   block = table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
-  [*1..9] - (row+table.transpose[point[:j]]+block).reject{ |n| n == 0 }.uniq
+  [*1..9] - (row+table.transpose[j]+block).reject{ |n| n == 0 }.uniq
 end
 
 def view(table)
+  p '---'
   table.each_with_index do |row, i|
     p row[0..2].join('') + ' ' + row[3..5].join('') + ' ' + row[6..8].join('')
     p '' if i%3 == 2 && i != 8
   end
+  p '---'
 end
 
 def compare_table(a, b)
@@ -119,16 +132,8 @@ File.open("sudoku.txt") do |f|
     end
     
     if i%10 == 9
-      before_table = copy_table(table)
-      loop do
-        table = sequence(table)
-        break if cleared?(table) || compare_table(table, before_table)
-        before_table = copy_table(table)
-      end
-      if before_table == table
-        solve(table)
-      end
-      answer += table[0][0..2].map(&:to_s).join('').to_i if cleared?(table)
+      table = solve(table)
+      answer += table[0][0..2].map(&:to_s).join('').to_i
       view(table) if i%10 == 9
     end
     break if i == 19
