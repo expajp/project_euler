@@ -13,11 +13,12 @@
 50すべてのパズルを解き, それぞれの解答の左上隅にある3桁の数の合計を求めよ; 例えば483は上の解答例の左上隅の3桁の数である.
 ---
 
-各0についてタテ、横、箱の3つを調べて埋める、を無限ループで繰り返す
+ある0について、縦横ブロックを調べて入る数字の可能性が1つしかないものを埋める
+Grid 01はこれで解ける
 
----
-最も入りうる数字が少ない0を選び出す
-そこから深さ優先探索ですべての可能性が潰れるまで同様の処理を再帰的に続ける
+次に、それでも埋まらない場合について、候補の少ないものから調べていく
+ここの調べ方が重要、可能性の議論
+
 
 =end
 
@@ -38,9 +39,10 @@ def sequence(table)
 end
 
 def solve(table)
-  # view(table)
+  view(table)
   
   # 埋められる場所を埋める
+  # 不整合が起きたらハネて枝刈りする仕組みが必要
   before_table = copy_table(table)
   loop do
     table = sequence(table)
@@ -57,10 +59,11 @@ def solve(table)
   points.each do |point|
     searching_table = copy_table(table)
     nominated = nominated(searching_table, point)
+    return nil if nominated.length == 0
     nominated.each do |n|
       searching_table[point[:i]][point[:j]] = n
       # view(searching_table)
-      solve(searching_table)
+      next if solve(searching_table).nil?
     end
   end
 end
