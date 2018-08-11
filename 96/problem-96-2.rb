@@ -40,7 +40,9 @@ class Sudoku
 
   def solve
     preprocessing
-    view if cleared?
+    view
+    return if cleared?
+    solver(@table)
   end
   
   def cleared?
@@ -53,6 +55,29 @@ class Sudoku
 
   private
 
+  def solver(table)
+    s_points = searching_points(table)
+    p s_points
+    s_points.each do |i, j|
+      p_digits = possible_digits(table, i, j)
+      p p_digits
+    end
+  end
+
+  def searching_points(table)
+    e_map = table.map.with_index do |row, i|
+      row.map.with_index do |n, j|
+        n == 0 ? 9-possible_digits(table, i, j).length : 0
+      end
+    end
+    max = e_map.map{ |row| row.max }.max
+    return if max == 0
+    ret = []
+    e_map.each_with_index{ |row, i| row.each_with_index{ |n, j| ret << [i, j] if n == max } }
+    ret
+  end
+
+  
   def preprocessing
     before_table = []
     loop do
@@ -62,16 +87,16 @@ class Sudoku
     end
   end
 
-  def possible_digits(i, j)
-    block = @table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
-    [*1..9] - (@table[i]+@table.transpose[j]+block).reject{ |n| n == 0 }.uniq
+  def possible_digits(table, i, j)
+    block = table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
+    [*1..9] - (table[i]+table.transpose[j]+block).reject{ |n| n == 0 }.uniq
   end
 
   def pp_sequence
     @table.each_with_index do |row, i|
       row.each_with_index do |n, j|
         next if n != 0
-        p_digits = possible_digits(i, j)
+        p_digits = possible_digits(@table, i, j)
         if p_digits.length == 1
           @table[i][j] = p_digits.first
           return
@@ -102,5 +127,5 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus.each(&:solve)
-p sudokus.map(&:answer).sum
+sudokus[0..1].each(&:solve)
+#p sudokus.map(&:answer).sum
