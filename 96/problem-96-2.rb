@@ -38,6 +38,11 @@ class Sudoku
     p '---'
   end
 
+  def solve
+    preprocessing
+    view if cleared?
+  end
+  
   def cleared?
     !(@table.flatten.find{ |n| n == 0 })
   end
@@ -45,6 +50,42 @@ class Sudoku
   def answer
     @table[0][0..2].map(&:to_s).join('').to_i
   end
+
+  private
+
+  def preprocessing
+    before_table = []
+    loop do
+      pp_sequence
+      break if @table == before_table
+      before_table = copy_table(@table)
+    end
+  end
+
+  def possible_digits(i, j)
+    block = @table[(i/3)*3, 3].map{ |a| a[(j/3)*3, 3] }.flatten
+    [*1..9] - (@table[i]+@table.transpose[j]+block).reject{ |n| n == 0 }.uniq
+  end
+
+  def pp_sequence
+    @table.each_with_index do |row, i|
+      row.each_with_index do |n, j|
+        next if n != 0
+        p_digits = possible_digits(i, j)
+        if p_digits.length == 1
+          @table[i][j] = p_digits.first
+          return
+        end
+      end
+    end
+  end
+
+  def copy_table(table)
+    ret = []
+    table.each_with_index{ |row, i| ret[i] = row.dup }
+    ret
+  end
+
 end
 
 answer = 0
@@ -53,12 +94,13 @@ File.open("sudoku.txt") do |f|
   table = []
   f.each_line.with_index do |line, i|
     if line.match(/Grid [0-9]+/)
-      p line.gsub(/\n/, '')
       table = []
-    else
-      table[i%10-1] = line.gsub(/\n/, '').split('').map(&:to_i)
+      next
     end
+    table[i%10-1] = line.gsub(/\n/, '').split('').map(&:to_i)
     sudokus << Sudoku.new(table) if i%10 == 9
   end
 end
 
+sudokus.each(&:solve)
+p sudokus.map(&:answer).sum
