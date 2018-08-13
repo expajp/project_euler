@@ -39,7 +39,7 @@ class Sudoku
   end
 
   def solve
-    preprocessing
+    preprocessing(@table)
     view
     return if cleared?
     solver(@table)
@@ -61,6 +61,8 @@ class Sudoku
     s_points.each do |i, j|
       p_digits = possible_digits(table, i, j)
       p p_digits
+      # 仮定して矛盾が発生すればnilが返る
+      # 発生しなければ、その上で別の仮定を試す
     end
   end
 
@@ -77,13 +79,12 @@ class Sudoku
     ret
   end
 
-  
-  def preprocessing
+  def preprocessing(table)
     before_table = []
     loop do
-      pp_sequence
-      break if @table == before_table
-      before_table = copy_table(@table)
+      table = pp_sequence(table)
+      break if table == before_table
+      before_table = copy_table(table)
     end
   end
 
@@ -92,17 +93,19 @@ class Sudoku
     [*1..9] - (table[i]+table.transpose[j]+block).reject{ |n| n == 0 }.uniq
   end
 
-  def pp_sequence
-    @table.each_with_index do |row, i|
+  def pp_sequence(table)
+    copied_table = copy_table(table)
+    copied_table.each_with_index do |row, i|
       row.each_with_index do |n, j|
         next if n != 0
-        p_digits = possible_digits(@table, i, j)
+        p_digits = possible_digits(table, i, j)
         if p_digits.length == 1
-          @table[i][j] = p_digits.first
-          return
+          table[i][j] = p_digits.first
+          return table
         end
       end
     end
+    table
   end
 
   def copy_table(table)
