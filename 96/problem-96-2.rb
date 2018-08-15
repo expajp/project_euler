@@ -29,9 +29,9 @@ class Sudoku
     @table = table
   end
 
-  def view
+  def view(table)
     p '---'
-    @table.each_with_index do |row, i|
+    table.each_with_index do |row, i|
       p row[0..2].join('') + ' ' + row[3..5].join('') + ' ' + row[6..8].join('')
       p '' if i%3 == 2 && i != 8
     end
@@ -40,7 +40,7 @@ class Sudoku
 
   def solve
     preprocessing(@table)
-    view
+    view(@table)
     return if cleared?
     solver(@table)
   end
@@ -57,12 +57,17 @@ class Sudoku
 
   def solver(table)
     s_points = searching_points(table)
-    p s_points
     s_points.each do |i, j|
       p_digits = possible_digits(table, i, j)
-      p p_digits
-      # 仮定して矛盾が発生すればnilが返る
-      # 発生しなければ、その上で別の仮定を試す
+      p_digits.each do |digit|
+        copied_table = copy_table(table)
+        copied_table[i][j] = digit
+        view(copied_table)
+        updated_table = preprocessing(copied_table)
+        view(updated_table)
+        return nil if copied_table == updated_table
+        solver(updated_table)
+      end
     end
   end
 
@@ -86,6 +91,7 @@ class Sudoku
       break if table == before_table
       before_table = copy_table(table)
     end
+    table
   end
 
   def possible_digits(table, i, j)
