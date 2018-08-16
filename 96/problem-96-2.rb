@@ -40,9 +40,12 @@ class Sudoku
 
   def solve
     preprocessing(@table)
-    view(@table)
-    return if cleared?
+    if cleared?
+      view(@table)
+      return
+    end
     solver(@table)
+    view(@table)
   end
   
   def cleared?
@@ -56,17 +59,24 @@ class Sudoku
   private
 
   def solver(table)
-    s_points = searching_points(table)
-    s_points.each do |i, j|
-      p_digits = possible_digits(table, i, j)
-      p_digits.each do |digit|
+    
+    searching_points(table).each do |i, j|
+      possible_digits(table, i, j).each do |digit|
+        # p "digit: #{digit}"
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        view(copied_table)
-        updated_table = preprocessing(copied_table)
-        view(updated_table)
-        return nil if copied_table == updated_table
-        solver(updated_table)
+        # p 'before'
+        # view(copied_table)
+        
+        updated_table = preprocessing(copy_table(copied_table))
+        # p 'after'
+        # view(updated_table)
+
+        if !(updated_table.flatten.find{ |n| n == 0 })
+          @table = updated_table
+          return nil
+        end
+        return nil if table == updated_table || solver(updated_table).nil?
       end
     end
   end
@@ -136,5 +146,5 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[0..1].each(&:solve)
+sudokus[0..2].each(&:solve)
 #p sudokus.map(&:answer).sum
