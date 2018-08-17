@@ -22,6 +22,12 @@ Grid 01はこれで解ける
 唯一の解を持つことから、最善計算量が少なくなる深さ優先探索で正解
 幅優先だと総当たりに限りなく近づいてしまう
 
+これでもやっぱり解けない場合がある
+おそらく原因は
+ * 矛盾があって絶対に解けない場合
+ * 仮定が足りない場合
+の区別ができていないこと
+しかし、矛盾がある場合をどうやって検出する？
 =end
 
 class Sudoku
@@ -65,18 +71,18 @@ class Sudoku
         # p "digit: #{digit}"
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        # p 'before'
-        # view(copied_table)
+        p 'before'
+        view(copied_table)
         
         updated_table = preprocessing(copy_table(copied_table))
-        # p 'after'
-        # view(updated_table)
+        p 'after'
+        view(updated_table)
 
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
           return nil
         end
-        return nil if table == updated_table || solver(updated_table).nil?
+        return nil if solver(updated_table).nil?
       end
     end
   end
@@ -146,5 +152,5 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[0..2].each(&:solve)
+sudokus[5].solve #each(&:solve)
 #p sudokus.map(&:answer).sum
