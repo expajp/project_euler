@@ -71,12 +71,13 @@ class Sudoku
         # p "digit: #{digit}"
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        p 'before'
-        view(copied_table)
+        # p 'before'
+        # view(copied_table)
         
         updated_table = preprocessing(copy_table(copied_table))
-        p 'after'
-        view(updated_table)
+        
+        # p 'after'
+        # view(updated_table)
 
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
@@ -152,5 +153,7 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[5].solve #each(&:solve)
+sudokus[0..1].each(&:solve)
+sudokus[3..4].each(&:solve)
+sudokus[6..8].each(&:solve)
 #p sudokus.map(&:answer).sum
