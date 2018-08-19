@@ -65,23 +65,25 @@ class Sudoku
   private
 
   def solver(table)
-    
+    # そもそも「入る可能性のある数字から入れていく」というアプローチが間違い？
+    # もう少しアプローチをシンプルにして、総当たりに近いかたちで試すべき
     searching_points(table).each do |i, j|
       possible_digits(table, i, j).each do |digit|
-        # p "digit: #{digit}"
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        # p 'before'
-        # view(copied_table)
+        #p 'before'
+        #view(copied_table)
         
         updated_table = preprocessing(copy_table(copied_table))
         
-        # p 'after'
-        # view(updated_table)
+        #p 'after'
+        #view(updated_table)
 
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
           return nil
+        elsif copied_table == updated_table || searching_points(updated_table).nil?
+          next
         end
         return nil if solver(updated_table).nil?
       end
@@ -95,7 +97,7 @@ class Sudoku
       end
     end
     max = e_map.map{ |row| row.max }.max
-    return if max == 0
+    return nil if max == 0
     ret = []
     e_map.each_with_index{ |row, i| row.each_with_index{ |n, j| ret << [i, j] if n == max } }
     ret
@@ -153,7 +155,7 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[0..1].each(&:solve)
-sudokus[3..4].each(&:solve)
-sudokus[6..8].each(&:solve)
+sudokus[0..5].each(&:solve)
+#sudokus[6..7].each(&:solve)
+#sudokus[10..49].each(&:solve)
 #p sudokus.map(&:answer).sum
