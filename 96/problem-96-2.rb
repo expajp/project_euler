@@ -35,7 +35,7 @@ class Sudoku
     @table = table
   end
 
-  def view(table)
+  def view(table = @table)
     p '---'
     table.each_with_index do |row, i|
       p row[0..2].join('') + ' ' + row[3..5].join('') + ' ' + row[6..8].join('')
@@ -65,25 +65,20 @@ class Sudoku
   private
 
   def solver(table)
-    sps =  searching_points(table)
-    p sps
     searching_points(table).each do |i, j|
       possible_digits(table, i, j).each do |digit|
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        p 'before'
-        view(copied_table)
         
         updated_table = preprocessing(copy_table(copied_table))
         
-        p 'after'
-        view(updated_table)
-
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
           return nil
-        elsif copied_table == updated_table || searching_points(updated_table).nil?
+        elsif searching_points(updated_table).nil?
           next
+        #elsif copied_table == updated_table && p_digits_num 
+        #  next
         end
         return nil if solver(updated_table).nil?
       end
@@ -155,12 +150,12 @@ File.open("sudoku.txt") do |f|
   end
 end
 
+
 =begin
-(sudokus[0..7]+[sudokus[0]]+sudokus[9..39]+[sudokus[0]]+sudokus[41..49]).each_with_index do |sudoku, i|
+sudokus.each_with_index do |sudoku, i|
   p "Grid #{i}"
   sudoku.solve
 end
 =end
-
-sudokus[8].solve
+# sudokus[8].solve
 # sudokus[40].solve
