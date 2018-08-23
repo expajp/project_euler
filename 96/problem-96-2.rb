@@ -65,18 +65,19 @@ class Sudoku
   private
 
   def solver(table)
-    p searching_points(table)
+    sps =  searching_points(table)
+    p sps
     searching_points(table).each do |i, j|
       possible_digits(table, i, j).each do |digit|
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        # p 'before'
-        # view(copied_table)
+        p 'before'
+        view(copied_table)
         
         updated_table = preprocessing(copy_table(copied_table))
         
-        # p 'after'
-        # view(updated_table)
+        p 'after'
+        view(updated_table)
 
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
@@ -95,8 +96,8 @@ class Sudoku
         n == 0 ? 9-possible_digits(table, i, j).length : 0
       end
     end
-    return nil if e_map.map{ |row| row.max }.max == 0
-    view(e_map)
+    map_max = e_map.map{ |row| row.max }.max
+    return nil if map_max == 0 || map_max == 9
     ret = []
     e_map.each_with_index{ |row, i| row.each_with_index{ |n, j| ret << [i, j, n] } }
     ret.sort{ |a, b| b[2] <=> a[2] }.map{ |a| a[0..1] }
@@ -154,4 +155,12 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[2].solve
+=begin
+(sudokus[0..7]+[sudokus[0]]+sudokus[9..39]+[sudokus[0]]+sudokus[41..49]).each_with_index do |sudoku, i|
+  p "Grid #{i}"
+  sudoku.solve
+end
+=end
+
+sudokus[8].solve
+# sudokus[40].solve
