@@ -77,8 +77,21 @@ class Sudoku
           return nil
         elsif searching_points(updated_table).nil?
           next
-        #elsif copied_table == updated_table && p_digits_num 
-        #  next
+        elsif copied_table == updated_table
+          # problem 8 はこれがあると動かない
+          # problem 2 はこれがないと動かない
+          # つまり、Problem 8でスキップされるような条件をandで設定しないといけない
+          # 逆に言えば、値を1つ仮定して一切埋まらなくても次の仮定を取りたい状況ってなんだろう？
+          # 2つ仮定を置かないと先に進めない状況を想定しないといけない
+          # 逆に、値を1つ仮定して状況が変わらないならハネても良いときって？
+          # よく考えると、「値を1つ仮定して状況が変わらない」というのは、
+          # 高確率で無駄になるだけで100%無駄になるわけじゃない
+          # ということは、普通に進めても問題ないはず
+          # でも、Problem 2はこれがないと動かないので、代わる条件、
+          # もしかすると全く違う条件を設定する必要？
+          
+          # view updated_table
+          # next
         end
         return nil if solver(updated_table).nil?
       end
@@ -157,5 +170,6 @@ sudokus.each_with_index do |sudoku, i|
   sudoku.solve
 end
 =end
-# sudokus[8].solve
+#sudokus[2].solve
+sudokus[8].solve
 # sudokus[40].solve
