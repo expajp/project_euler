@@ -75,8 +75,6 @@ class Sudoku
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
           return nil
-        elsif searching_points(updated_table).nil?
-          next
         elsif copied_table == updated_table
           # problem 8 はこれがあると動かない
           # problem 2 はこれがないと動かない
@@ -89,9 +87,11 @@ class Sudoku
           # ということは、普通に進めても問題ないはず
           # でも、Problem 2はこれがないと動かないので、代わる条件、
           # もしかすると全く違う条件を設定する必要？
-          
-          # view updated_table
-          # next
+          view updated_table
+          next
+        elsif searching_points(updated_table) == 'contradiction'
+          view updated_table
+          next
         end
         return nil if solver(updated_table).nil?
       end
@@ -105,7 +105,8 @@ class Sudoku
       end
     end
     map_max = e_map.map{ |row| row.max }.max
-    return nil if map_max == 0 || map_max == 9
+    return 'contradiction' if map_max == 9
+    return nil if map_max == 0
     ret = []
     e_map.each_with_index{ |row, i| row.each_with_index{ |n, j| ret << [i, j, n] } }
     ret.sort{ |a, b| b[2] <=> a[2] }.map{ |a| a[0..1] }
@@ -170,6 +171,6 @@ sudokus.each_with_index do |sudoku, i|
   sudoku.solve
 end
 =end
-#sudokus[2].solve
-sudokus[8].solve
+sudokus[2].solve
+# sudokus[8].solve
 # sudokus[40].solve
