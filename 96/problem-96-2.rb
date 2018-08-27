@@ -75,7 +75,7 @@ class Sudoku
         if !(updated_table.flatten.find{ |n| n == 0 })
           @table = updated_table
           return nil
-        elsif copied_table == updated_table
+        # elsif copied_table == updated_table
           # problem 8 はこれがあると動かない
           # problem 2 はこれがないと動かない
           # つまり、Problem 8でスキップされるような条件をandで設定しないといけない
@@ -87,10 +87,10 @@ class Sudoku
           # ということは、普通に進めても問題ないはず
           # でも、Problem 2はこれがないと動かないので、代わる条件、
           # もしかすると全く違う条件を設定する必要？
-          view updated_table
-          next
+          # view updated_table
+          # next
         elsif searching_points(updated_table) == 'contradiction'
-          view updated_table
+          # view updated_table
           next
         end
         return nil if solver(updated_table).nil?
@@ -165,12 +165,21 @@ File.open("sudoku.txt") do |f|
 end
 
 
-=begin
-sudokus.each_with_index do |sudoku, i|
+
+[sudokus[8], sudokus[40]].each_with_index do |sudoku, i|
   p "Grid #{i}"
   sudoku.solve
 end
+p [sudokus[8], sudokus[40]].map(&:answer).sum
+
+=begin
+(sudokus[0..7]+sudokus[9..39]+sudokus[41..49]).each_with_index do |sudoku, i|
+  p "Grid #{i}"
+  sudoku.solve
+end
+p (sudokus[0..7]+sudokus[9..39]+sudokus[41..49]).map(&:answer).sum
 =end
-sudokus[2].solve
+
+# sudokus[2].solve
 # sudokus[8].solve
 # sudokus[40].solve
