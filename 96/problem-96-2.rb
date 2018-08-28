@@ -22,6 +22,12 @@ Grid 01はこれで解ける
 唯一の解を持つことから、最善計算量が少なくなる深さ優先探索で正解
 幅優先だと総当たりに限りなく近づいてしまう
 
+これでもやっぱり解けない場合がある
+おそらく原因は
+ * 矛盾があって絶対に解けない場合
+ * 仮定が足りない場合
+の区別ができていないこと
+しかし、矛盾がある場合をどうやって検出する？
 =end
 
 class Sudoku
@@ -29,7 +35,7 @@ class Sudoku
     @table = table
   end
 
-  def view(table)
+  def view(table = @table)
     p '---'
     table.each_with_index do |row, i|
       p row[0..2].join('') + ' ' + row[3..5].join('') + ' ' + row[6..8].join('')
@@ -40,9 +46,12 @@ class Sudoku
 
   def solve
     preprocessing(@table)
-    view(@table)
-    return if cleared?
+    if cleared?
+      view(@table)
+      return
+    end
     solver(@table)
+    view(@table)
   end
   
   def cleared?
@@ -56,17 +65,35 @@ class Sudoku
   private
 
   def solver(table)
-    s_points = searching_points(table)
-    s_points.each do |i, j|
-      p_digits = possible_digits(table, i, j)
-      p_digits.each do |digit|
+    searching_points(table).each do |i, j|
+      possible_digits(table, i, j).each do |digit|
         copied_table = copy_table(table)
         copied_table[i][j] = digit
-        view(copied_table)
-        updated_table = preprocessing(copied_table)
-        view(updated_table)
-        return nil if copied_table == updated_table
-        solver(updated_table)
+        
+        updated_table = preprocessing(copy_table(copied_table))
+        
+        if !(updated_table.flatten.find{ |n| n == 0 })
+          @table = updated_table
+          return nil
+        # elsif copied_table == updated_table
+          # problem 8 はこれがあると動かない
+          # problem 2 はこれがないと動かない
+          # つまり、Problem 8でスキップされるような条件をandで設定しないといけない
+          # 逆に言えば、値を1つ仮定して一切埋まらなくても次の仮定を取りたい状況ってなんだろう？
+          # 2つ仮定を置かないと先に進めない状況を想定しないといけない
+          # 逆に、値を1つ仮定して状況が変わらないならハネても良いときって？
+          # よく考えると、「値を1つ仮定して状況が変わらない」というのは、
+          # 高確率で無駄になるだけで100%無駄になるわけじゃない
+          # ということは、普通に進めても問題ないはず
+          # でも、Problem 2はこれがないと動かないので、代わる条件、
+          # もしかすると全く違う条件を設定する必要？
+          # view updated_table
+          # next
+        elsif searching_points(updated_table) == 'contradiction'
+          # view updated_table
+          next
+        end
+        return nil if solver(updated_table).nil?
       end
     end
   end
@@ -77,11 +104,12 @@ class Sudoku
         n == 0 ? 9-possible_digits(table, i, j).length : 0
       end
     end
-    max = e_map.map{ |row| row.max }.max
-    return if max == 0
+    map_max = e_map.map{ |row| row.max }.max
+    return 'contradiction' if map_max == 9
+    return nil if map_max == 0
     ret = []
-    e_map.each_with_index{ |row, i| row.each_with_index{ |n, j| ret << [i, j] if n == max } }
-    ret
+    e_map.each_with_index{ |row, i| row.each_with_index{ |n, j| ret << [i, j, n] } }
+    ret.sort{ |a, b| b[2] <=> a[2] }.map{ |a| a[0..1] }
   end
 
   def preprocessing(table)
@@ -136,5 +164,22 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[0..1].each(&:solve)
-#p sudokus.map(&:answer).sum
+
+
+[sudokus[8], sudokus[40]].each_with_index do |sudoku, i|
+  p "Grid #{i}"
+  sudoku.solve
+end
+p [sudokus[8], sudokus[40]].map(&:answer).sum
+
+=begin
+(sudokus[0..7]+sudokus[9..39]+sudokus[41..49]).each_with_index do |sudoku, i|
+  p "Grid #{i}"
+  sudoku.solve
+end
+p (sudokus[0..7]+sudokus[9..39]+sudokus[41..49]).map(&:answer).sum
+=end
+
+# sudokus[2].solve
+# sudokus[8].solve
+# sudokus[40].solve
