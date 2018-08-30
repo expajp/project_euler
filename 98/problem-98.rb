@@ -15,3 +15,17 @@ arr = []
 File.open("words.txt") do |f|
   arr = f.gets.gsub(/\"/, '').split(',')
 end
+
+def anagram(word, arr)
+  characters = word.split('')
+  arr.each do |w|
+    word_characters = w.split('')
+    # p characters.map{ |c| word_characters.include?(c) }
+    # p word_characters.map{ |c| characters.include?(c) }
+    return w if characters.map{ |c| word_characters.include?(c) }.inject(:&) && word_characters.map{ |c| characters.include?(c) }.inject(:&) && word != w && word.length == w.length
+  end
+  nil
+end
+
+p arr[1]
+p anagram(arr[1], arr)
