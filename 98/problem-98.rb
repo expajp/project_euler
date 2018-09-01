@@ -11,20 +11,53 @@ CARE という単語の各文字をそれぞれ 1, 2, 9, 6 に置き換えるこ
 注: 作られるアナグラムは, すべて与えられたテキストファイルに含まれている.
 =end
 
+def square?(n)
+  (Math.sqrt(n).floor)**2 == n
+end
+
 arr = []
 File.open("words.txt") do |f|
   arr = f.gets.gsub(/\"/, '').split(',')
 end
 
 def anagram(word, arr)
-  characters = word.split('')
+  word_characters = word.split('')
   arr.each do |w|
     next if word.length != w.length || word == w || word.reverse == word
-    word_characters = w.split('')
-    return w if characters.map{ |c| word_characters.include?(c) }.inject(:&) && word_characters.map{ |c| characters.include?(c) }.inject(:&)
+    
+    w_characters = w.split('')
+    word_in_w = word_characters.map{ |c| w_characters.include?(c) }.inject(:&)
+    w_in_word = w_characters.map{ |c| word_characters.include?(c) }.inject(:&)
+    
+    return w if word_in_w && w_in_word
   end
   nil
 end
 
 pairs = arr.map{ |word| [word, anagram(word, arr)] }.reject{ |pair| pair[1].nil? }
-p pairs
+squares = [nil, [1, 4, 9]]
+[*2..12].each do |digits|
+  squares[digits] = []
+  n = Math.sqrt((squares[digits-1]).last).to_i+1
+  loop do
+    squares[digits] << n**2
+    n += 1
+    break if (n**2).to_s.length > digits
+  end
+end
+
+max = 0
+pairs.each do |pair|
+  len = pair.first.length
+  next if max > 10**(len-1)
+  charas = pair.first.split('')
+  squares[len].each do |sq|
+    nums = sq.to_s.split('').map(&:to_i)
+    table = nums.map.with_index{ |n, i| [charas[i], n] }.to_h
+    ana = pair.last.split('').map{ |c| table[c] }.join.to_i
+    max = [max, sq, ana].max if square?(ana)
+  end
+end
+p max
+#pairs.each do |pair|
+#end
