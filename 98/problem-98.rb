@@ -51,9 +51,10 @@ pairs.each do |pair|
   len = pair.first.length
   next if max > 10**(len-1)
   charas = pair.first.split('')
+  next if charas.length != charas.uniq.length
   squares[len].each do |sq|
     nums = sq.to_s.split('').map(&:to_i)
-    table = nums.map.with_index{ |n, i| [charas[i], n] }.to_h
+    table = nums.map.with_index{ |n, i| [charas[i], n] }
     ana = pair.last.split('').map{ |c| table[c] }.join.to_i
     max = [max, sq, ana].max if square?(ana)
   end
