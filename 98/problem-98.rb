@@ -15,28 +15,34 @@ def square?(n)
   (Math.sqrt(n).floor)**2 == n
 end
 
-arr = []
-File.open("words.txt") do |f|
-  arr = f.gets.gsub(/\"/, '').split(',')
-end
-
 def anagram(word, arr)
   word_characters = word.split('')
   arr.each do |w|
     next if word.length != w.length || word == w || word.reverse == word
     
     w_characters = w.split('')
-    word_in_w = word_characters.map{ |c| w_characters.include?(c) }.inject(:&)
-    w_in_word = w_characters.map{ |c| word_characters.include?(c) }.inject(:&)
-    
-    return w if word_in_w && w_in_word
+    word_characters.each do |c|
+      idx = w_characters.index(c)
+      break if idx.nil?
+      w_characters.delete_at(idx)
+    end
+    return w if w_characters.empty?
   end
   nil
 end
 
+
+arr = []
+File.open("words.txt") do |f|
+  arr = f.gets.gsub(/\"/, '').split(',')
+end
+
 pairs = arr.map{ |word| [word, anagram(word, arr)] }.reject{ |pair| pair[1].nil? }
+min_len = pairs.map(&:first).map(&:length).min
+max_len = pairs.map(&:first).map(&:length).max
+
 squares = [nil, [1, 4, 9]]
-[*2..12].each do |digits|
+[*min_len..max_len].each do |digits|
   squares[digits] = []
   n = Math.sqrt((squares[digits-1]).last).to_i+1
   loop do
@@ -50,15 +56,16 @@ max = 0
 pairs.each do |pair|
   len = pair.first.length
   next if max > 10**(len-1)
+  
   charas = pair.first.split('')
-  next if charas.length != charas.uniq.length
   squares[len].each do |sq|
-    nums = sq.to_s.split('').map(&:to_i)
-    table = nums.map.with_index{ |n, i| [charas[i], n] }
-    ana = pair.last.split('').map{ |c| table[c] }.join.to_i
-    max = [max, sq, ana].max if square?(ana)
+    nums = sq.to_s.split('')
+    c_to_i = nums.map.with_index{ |n, i| [charas[i], n] }.to_h
+    i_to_c = c_to_i.invert
+    next if pair.first != nums.map{ |n| i_to_c[n] }.join
+
+    check_num = pair.last.split('').map{ |c| c_to_i[c] }.join.to_i
+    max = [sq, check_num, max].max if square?(check_num)
   end
 end
 p max
-#pairs.each do |pair|
-#end
