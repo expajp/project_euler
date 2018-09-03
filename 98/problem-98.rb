@@ -61,10 +61,16 @@ pairs.each do |pair|
   squares[len].each do |sq|
     nums = sq.to_s.split('')
     c_to_i = nums.map.with_index{ |n, i| [charas[i], n] }.to_h
+
+    # 数字と文字が対応付けられるか確認
     i_to_c = c_to_i.invert
     next if pair.first != nums.map{ |n| i_to_c[n] }.join
 
+    # 2つめの単語を数字に変換し、先頭が0になるパターンを排除
     check_num = pair.last.split('').map{ |c| c_to_i[c] }.join.to_i
+    next if check_num < 10**(len-1)
+
+    # 最大値を格納
     max = [sq, check_num, max].max if square?(check_num)
   end
 end
