@@ -42,7 +42,12 @@ class Sudoku
 
   def solver(table)
     sp = searching_point(table)
-    return nil if sp.empty?
+    # view(table)
+    # p sp
+    if sp.empty?
+      @table = table
+      return nil
+    end
     p_digits = possible_digits(table, sp[0], sp[1])
     p_digits.each do |n|
       trying_table = copy_table(table)
@@ -110,5 +115,5 @@ File.open("sudoku.txt") do |f|
   end
 end
 
-sudokus[0..1].each(&:solve)
-# p [sudokus[8], sudokus[40]].map(&:answer).sum
+sudokus.each(&:solve)
+p sudokus.map(&:answer).sum
