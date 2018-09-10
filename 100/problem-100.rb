@@ -23,24 +23,15 @@ P(BB) = (15/21) × (14/20) = 1/2
 n*(n-1)は必ず偶数なので、n*(n-1)/2を求め、隣り合った数の積になっているかどうかを調べる
 隣り合った数の積であるとき、(平方根の床関数)*(平方根の天井関数)に一致する
 この天井関数の側がmである
+--
+
+このままだとまったく解けないので、ググる
+何度も出てきたペル方程式であることがわかる
+平方を含み、整数解を持つディオファントス方程式
+
+右辺が-1である形には解が存在しない場合がある
+これを調べて実装する
+
 =end
 require 'prime'
 
-n = 10**12
-loop do
-  n += 1
-  p n
-
-  num = n*(n-1)/2
-  next unless num%2 == 0
-  next if num.prime?
-  
-  floor = Math.sqrt(num).floor
-  ceil = Math.sqrt(num).ceil
-  next if floor == ceil
-
-  if num == floor*ceil
-    p "n: #{n}, m: #{ceil}"
-    break
-  end
-end
