@@ -1,17 +1,8 @@
-# Project Eular
+# Project Euler
 
 https://projecteuler.net
 
-いろんな言語で解いていきます
+100問目までRubyで解答済み(2018/09/11)
 
-とりあえずCとRubyメイン
-
-## 12まで
-Cで解いた
-
-ソースコードが残っていないものも一部あり
-
-## 13以降
-Rubyで取組中
-
+12問目まではCでも解答
 
